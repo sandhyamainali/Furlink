@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import logo from '../../img/logo.png';
+
+
 const PetFoodWebsite = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
 
     return (
         <div className="container">
@@ -13,23 +15,23 @@ const PetFoodWebsite = () => {
                 <div className="nav-container ">
                     {/* Logo */}
                     <div className="logo">
-                        <Image src={logo} alt="Furlink Logo" width={90} height={90} />
+                        <Image src="/img/logo.png" alt="Furlink Logo" width={90} height={90} />
                     </div>
 
                     {/* Navigation Menu */}
-                    <ul className="nav-menu">
+                    <ul className="nav-menu ">
                         <li>
-                            <Link href="/" className="nav-link active">
+                            <Link href="/" className="nav-link active ">
                                 Home
                             </Link>
                         </li>
                         <li>
-                            <Link href="/about" className="nav-link">
+                            <Link href="/about" className="nav-link active">
                                 About
                             </Link>
                         </li>
                         <li>
-                            <Link href="/service" className="nav-link">
+                            <Link href="/service" className="nav-link active">
                                 Service
                             </Link>
                         </li>
@@ -109,15 +111,15 @@ const PetFoodWebsite = () => {
                             <div className="dog-image-card">
                                 <div className="dog-image-placeholder">
                                     <div>
-                                        <Image src="https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2023/03/happy_dog_being_held_by_woman.jpeg.jpg"alt="pet image" width={700} height={400}/>
+                                        <Image src="/img/pet.png" alt="pet image" width={700} height={400} />
                                     </div>
-                                    
+
                                 </div>
                             </div>
                         </div>
 
-                       
-                        
+
+
 
                         {/* Decorative Elements */}
                         <div className="decorative-circle-1"></div>
@@ -125,38 +127,91 @@ const PetFoodWebsite = () => {
 
                         {/* Paw prints */}
                         <div className="paw-print-1">🐾</div>
-                       
+
                     </div>
                 </div>
             </section>
 
             {/* header section end */}
 
-{/* Service section start */}
-{/* <section>
-    <div className="service">
-        <h1 className='font-bold pt-8  '>Our Service</h1>
-    </div>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl mx-auto">
-    {[1, 2, 3, 4].map((_, idx) => (
-      <div key={idx} className="flex flex-col items-center">
-        <Image
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROK8sjpdGkJ7NGWZumbCxdMRc8r9qyG7XwuA&s"
-          alt={`Service ${idx + 1}`}
-          width={300}
-          height={200}
-          className="rounded-lg object-cover"
-          priority={false}
-        />
-        <button className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-          Learn More
-        </button>
-      </div>
-    ))}
-  </div>
-</section> */}
+            {/* Service section start */}
+            {/* <section>
+                <div className="service">
+                    <h1 className='font-bold pt-8  '>Our Service</h1>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl  ser">
+                    {[1, 2, 3, 4].map((_, idx) => (
+                        <div key={idx} className=" ">
+                            <Image
+                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROK8sjpdGkJ7NGWZumbCxdMRc8r9qyG7XwuA&s"
+                                alt={`Service ${idx + 1}`}
+                                width={300}
+                                height={200}
+                                className="rounded-lg object-cover transition"
+                                priority={false}
+                            />
+                            <button className="px-6 py-4 font-bold rounded-lg  transition">
+                                Learn More
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            </section> */}
 
             
+
+
+    <section className="py-16 px-4 bg-gradient-to-b from-gray-50 to-white">
+      {/* Header with fade-in animation */}
+      <div className="text-center mb-12">
+        <h1 className="text-4xl md:text-6xl font-bold text-gray-800 animate-fade-in-up">
+          Our Service
+        </h1>
+      </div>
+
+      {/* Service Grid with staggered animations */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 max-w-7xl mx-auto ser">
+        {[1, 2, 3, 4].map((_, idx) => (
+          <div 
+            key={idx} 
+            className="group relative overflow-hidden rounded-xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in-up"
+            style={{ animationDelay: `${idx * 150}ms` }}
+          >
+            {/* Image Container with overlay */}
+            <div className="relative overflow-hidden rounded-t-xl">
+              <Image
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROK8sjpdGkJ7NGWZumbCxdMRc8r9qyG7XwuA&s"
+                alt={`Service ${idx + 1}`}
+                width={300}
+                height={200}
+                className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
+                priority={false}
+              />
+              
+              {/* Overlay that appears on hover */}
+              {/* <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div> */}
+            </div>
+
+            {/* Button Container */}
+            <div className="p-6">
+              <button className="w-full  text-white font-bold py-3 rounded-lg px-6 rounded-full shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 ">
+                <span className="relative z-10">Learn More</span>
+              </button>
+            </div>
+
+            {/* Animated border effect */}
+            {/* <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-orange-400 transition-colors duration-300"></div> */}
+          </div>
+        ))}
+      </div>
+
+      <style jsx>{`
+        
+      `}</style>
+    </section>
+
+
+
 
         </div>
     );

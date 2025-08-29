@@ -1,7 +1,7 @@
 {
   "name": "frulink-project",
   "version": "0.1.0",
-  "type":"module",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,9 +10,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "bootstrap": "^5.3.7",
+    "next": "15.4.2",
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "next": "15.4.2"
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

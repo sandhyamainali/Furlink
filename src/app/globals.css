@@ -1,11 +1,14 @@
-/* Pet Food Website Styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Reset and Base Styles */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 
 :root{
    --primary-color:#dc9a6a;
@@ -177,16 +180,7 @@ nav {
   border-radius: 50%;
   filter: blur(60px);
 }
-.bg-circle-3 {
-  position: absolute;
-  bottom: 8rem;
-  left: 10rem;
-  width: 10rem;
-  height: 10rem;
-  background-color: #fcd34d;
-  border-radius: 50%;
-  filter: blur(60px);
-}
+
 
 .header-container {
   max-width: 1280px;
@@ -265,6 +259,9 @@ nav {
   color: var(--secondary-color);
   transform: translateY(-2px);
 }
+
+/* home css  */
+
 
 /* Pet Images Section */
 .pet-images-section {
@@ -800,12 +797,7 @@ nav {
   margin-top: 10px;
 }
 
-.footer {
-  background-color: #f0f0f0;
-  padding: 30px 20px;
-  margin-top: 50px;
-  text-align: center;
-}
+
 
 .footer p {
   font-weight: bold;

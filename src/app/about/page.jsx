@@ -54,9 +54,11 @@ function AboutPage() {
 
                     {/* Login Button */}
                     <div>
+                        <Link href="/login">
                         <button className="login-button">
-                            Log In
+                             Log In 
                         </button>
+                        </Link>
                     </div>
 
                     {/* Mobile menu button */}

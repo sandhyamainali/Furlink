@@ -33,17 +33,17 @@ const getServiceCard = (icon, title, desc) => (
 );
 
 // Testimonial card
-const getTestimonialCard = (image, name, feedback) => (
-  <div
-    className="testimonialCard p-6 bg-white rounded-lg shadow-md flex flex-col items-center text-center max-w-xs mx-auto"
-    role="region"
-    aria-label={`Testimonial from ${name}`}
-  >
-    <Image src={image} alt={`Photo of ${name}`} width={80} height={80} className="rounded-full object-cover"/>
-    <h4 className="mt-4 text-xl font-semibold">{name}</h4>
-    <p className="mt-3 text-gray-700 text-base">{feedback}</p>
-  </div>
-);
+// const getTestimonialCard = (image, name, feedback) => (
+//   <div
+//     className="testimonialCard p-6 bg-white rounded-lg shadow-md flex flex-col items-center text-center max-w-xs mx-auto"
+//     role="region"
+//     aria-label={`Testimonial from ${name}`}
+//   >
+//     <Image src={image} alt={`Photo of ${name}`} width={80} height={80} className="rounded-full object-cover"/>
+//     <h4 className="mt-4 text-xl font-semibold">{name}</h4>
+//     <p className="mt-3 text-gray-700 text-base">{feedback}</p>
+//   </div>
+// );
 
 function ServicePage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -56,23 +56,7 @@ function ServicePage() {
   //   { icon: '/img/booking.png', text: 'Easy online booking' },
   // ];
 
-  const testimonials = [
-    {
-      name: 'Sarah & Milo',
-      feedback: 'Furlink’s temporary hosting service helped me while I was away. Milo was well cared for and happy!',
-      // image: '/img/testimonial1.jpg',
-    },
-    {
-      name: 'Ravi & Bella',
-      feedback: 'The caregivers at Furlink feel like family. Bella loves her foster home — so grateful for this community!',
-      // image: '/img/testimonial2.jpg',
-    },
-    {
-      name: 'Anita & Max',
-      feedback: 'The fostering program made a huge difference for Max during recovery. Excellent support and care.',
-      // image: '/img/testimonial3.jpg',
-    },
-  ];
+
 
   const services = [
     {
@@ -168,9 +152,11 @@ function ServicePage() {
 
           {/* Login Button */}
           <div className="hidden md:block">
-            <button className="login-button bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">
-              Log In
-            </button>
+            <Link href="/login">
+              <button className="login-button">
+                Log In
+              </button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -233,7 +219,8 @@ function ServicePage() {
       <section className="servicesList max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h2 className="text-center text-3xl font-bold text-gray-900 mb-10">What We Offer</h2>
         <Swiper modules={[Navigation, Pagination, A11y]} spaceBetween={10} slidesPerView={1} navigation pagination={{ clickable: true }}
-          breakpoints={{ 640: { slidesPerView: 1 },768: { slidesPerView: 2 }, 1024: { slidesPerView: 3 }, 1280: { slidesPerView: 4 },
+          breakpoints={{
+            640: { slidesPerView: 1 }, 768: { slidesPerView: 2 }, 1024: { slidesPerView: 3 }, 1280: { slidesPerView: 4 },
           }}
         >
           {services.map(({ icon, title, desc }, idx) => (
@@ -275,26 +262,8 @@ function ServicePage() {
         </div>
       </section>
 
-      {/* Testimonials with Slider */}
-      <section className="bg-fef9f5 py-16 px-4 sm:px-6 lg:px-8">
-        <h2 className="text-center text-3xl font-bold text-gray-900 mb-12">What Our Clients Say</h2>
-        <Swiper
-          modules={[Navigation, Pagination, A11y]}
-          spaceBetween={30}
-          slidesPerView={1}
-          navigation
-          pagination={{ clickable: true }}
-          breakpoints={{
-            640: { slidesPerView: 1 },
-            768: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
-          }}
-        >
-          {testimonials.map(({ name, feedback, image }, idx) => (
-            <SwiperSlide key={idx}>{getTestimonialCard(image, name, feedback)}</SwiperSlide>
-          ))}
-        </Swiper>
-      </section>
+
+
 
       {/* Call To Action */}
       <section className="ctaSection max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">

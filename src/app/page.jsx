@@ -54,9 +54,11 @@ const PetFoodWebsite = () => {
 
                     {/* Login Button */}
                     <div>
+                        <Link href="/login">
                         <button className="login-button">
-                            Log In
+                             Log In 
                         </button>
+                        </Link>
                     </div>
 
                     {/* Mobile menu button */}
@@ -134,82 +136,10 @@ const PetFoodWebsite = () => {
 
             {/* header section end */}
 
-            {/* Service section start */}
-            {/* <section>
-                <div className="service">
-                    <h1 className='font-bold pt-8  '>Our Service</h1>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl  ser">
-                    {[1, 2, 3, 4].map((_, idx) => (
-                        <div key={idx} className=" ">
-                            <Image
-                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROK8sjpdGkJ7NGWZumbCxdMRc8r9qyG7XwuA&s"
-                                alt={`Service ${idx + 1}`}
-                                width={300}
-                                height={200}
-                                className="rounded-lg object-cover transition"
-                                priority={false}
-                            />
-                            <button className="px-6 py-4 font-bold rounded-lg  transition">
-                                Learn More
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            </section> */}
-
-            
+           
 
 
-    <section className="py-16 px-4 bg-gradient-to-b from-gray-50 to-white">
-      {/* Header with fade-in animation */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-6xl font-bold text-gray-800 animate-fade-in-up">
-          Our Service
-        </h1>
-      </div>
-
-      {/* Service Grid with staggered animations */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 max-w-7xl mx-auto ser">
-        {[1, 2, 3, 4].map((_, idx) => (
-          <div 
-            key={idx} 
-            className="group relative overflow-hidden rounded-xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in-up"
-            style={{ animationDelay: `${idx * 150}ms` }}
-          >
-            {/* Image Container with overlay */}
-            <div className="relative overflow-hidden rounded-t-xl">
-              <Image
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROK8sjpdGkJ7NGWZumbCxdMRc8r9qyG7XwuA&s"
-                alt={`Service ${idx + 1}`}
-                width={300}
-                height={200}
-                className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
-                priority={false}
-              />
-              
-              {/* Overlay that appears on hover */}
-              {/* <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div> */}
-            </div>
-
-            {/* Button Container */}
-            <div className="p-6">
-              <button className="w-full  text-white font-bold py-3 rounded-lg px-6 rounded-full shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 ">
-                <span className="relative z-10">Learn More</span>
-              </button>
-            </div>
-
-            {/* Animated border effect */}
-            {/* <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-orange-400 transition-colors duration-300"></div> */}
-          </div>
-        ))}
-      </div>
-
-      <style jsx>{`
-        
-      `}</style>
-    </section>
-
+   
 
 
 

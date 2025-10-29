@@ -11,6 +11,7 @@ export default function CartPage() {
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+      
       <h1>Your Cart</h1>
       <ul style={{ listStyle: "none", padding: 0 }}>
         {cartItems.map(({ id, name, price, quantity }) => (

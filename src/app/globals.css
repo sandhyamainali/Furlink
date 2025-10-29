@@ -14,6 +14,7 @@
    --primary-color:#dc9a6a;
    --secondary-color:#ae6a41;
 }
+
 a{
   text-decoration: none;
 }
@@ -750,6 +751,66 @@ nav {
   margin: 20px auto;
   font-size: 1.1rem;
   color: #444;
+}
+.ourMission {
+  background-color: #fffdf8;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.ourMission h2 {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  color: #cc4400;
+  animation: fadeInDown 1s ease forwards;
+}
+
+.ourMission p {
+  margin-bottom: 60px; /* increased gap below paragraph */
+  opacity: 0;
+  animation: fadeIn 1.5s ease forwards;
+  animation-delay: 0.3s;
+}
+
+/* Animate cards */
+.featureGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+.card {
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  width: 300px;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: transform 0.5s ease, box-shadow 0.3s ease;
+  animation: fadeInUp 1s ease forwards;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+
+/* Animation Keyframes */
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .whyChoose {

@@ -32,29 +32,12 @@ const getServiceCard = (icon, title, desc) => (
   </div>
 );
 
-// Testimonial card
-// const getTestimonialCard = (image, name, feedback) => (
-//   <div
-//     className="testimonialCard p-6 bg-white rounded-lg shadow-md flex flex-col items-center text-center max-w-xs mx-auto"
-//     role="region"
-//     aria-label={`Testimonial from ${name}`}
-//   >
-//     <Image src={image} alt={`Photo of ${name}`} width={80} height={80} className="rounded-full object-cover"/>
-//     <h4 className="mt-4 text-xl font-semibold">{name}</h4>
-//     <p className="mt-3 text-gray-700 text-base">{feedback}</p>
-//   </div>
-// );
+
 
 function ServicePage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // const benefits = [
-  //   { icon: '/img/professional.jpg', text: 'Certified professionals with years of experience' },
-  //   { icon: '/img/pricing.jpg', text: 'Affordable and transparent pricing' },
-  //   { icon: '/img/hygiene.jpg', text: 'Hygienic and well-equipped facility' },
-  //   { icon: '/img/peace.jpg', text: 'Stress-free environment for pets' },
-  //   { icon: '/img/booking.png', text: 'Easy online booking' },
-  // ];
+ 
 
 
 
@@ -148,6 +131,11 @@ function ServicePage() {
             <li><Link href="/contact" className="nav-link hover:text-indigo-600">Contact</Link></li>
             <li><Link href="/gallery" className="nav-link hover:text-indigo-600">Gallery</Link></li>
             <li><Link href="/shop" className="nav-link hover:text-indigo-600">Shop</Link></li>
+            <li>
+                            <Link href="/adoption" className="nav-link">
+                                Adoption
+                            </Link>
+                        </li>
           </ul>
 
           {/* Login Button */}
@@ -209,10 +197,10 @@ function ServicePage() {
           Furlink connects pet owners to trusted caregivers for short-term hosting, fostering, training,
           grooming, and veterinary consultations — all tailored for your pet’s wellbeing.
         </p>
-        <div className="mt-10 rounded-lg overflow-hidden shadow-lg">
+        {/* <div className="mt-10 rounded-lg overflow-hidden shadow-lg">
           <Image src="/img/service-hero.jpg" alt="Pets receiving care and attention" width={2000} height={400}
             priority className="w-full object-cover" />
-        </div>
+        </div> */}
       </section>
 
       {/* Services List with Slider */}

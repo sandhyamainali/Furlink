@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link'; 
+import Link from 'next/link';
 
 
 const PetFoodWebsite = () => {
@@ -50,14 +50,19 @@ const PetFoodWebsite = () => {
                                 Shop
                             </Link>
                         </li>
+                        <li>
+                            <Link href="/adoption" className="nav-link">
+                                Adoption
+                            </Link>
+                        </li>
                     </ul>
 
                     {/* Login Button */}
                     <div>
                         <Link href="/login">
-                        <button className="login-button">
-                             Log In 
-                        </button>
+                            <button className="login-button">
+                                Log In
+                            </button>
                         </Link>
                     </div>
 
@@ -87,7 +92,7 @@ const PetFoodWebsite = () => {
                     {/* Content Section */}
                     <div className="header-content">
                         <h1 className="header-title">
-                            <span className="header-title-orange">"Because They Deserve the Best</span>
+                            <span className="header-title-orange">"A Cloud Pet Hostel & Adoption Platform You Can Trust</span>
                             <br />
                             <span>- Healthy Food for Happy Pets!"</span>
                         </h1>
@@ -97,11 +102,11 @@ const PetFoodWebsite = () => {
                         </p>
 
                         <div className="button-container">
-                            <button className="primary-button">
-                                Shop Now
+                            <button className="primary-button text-sm">
+                                Adopt a Pet
                             </button>
                             <button className="secondary-button">
-                                Join with US
+                                Want a Pet for Adoption
                             </button>
                         </div>
                     </div>
@@ -136,10 +141,44 @@ const PetFoodWebsite = () => {
 
             {/* header section end */}
 
-           
+            {/* mission start */}
+            <section className="ourMission">
+                <h2 className='text-3xl md:text-4xl font-extrabold  mb-6'>Our Mission</h2>
+                <p className="text-lg text-[#5C3B15] max-w-3xl mx-auto  ">
+                    We believe every pet deserves love and care. Furlink provides an
+                    affordable, ethical, and community-driven platform that connects pets
+                    with loving families while supporting caregivers who provide temporary
+                    or permanent homes.
+                </p>
+                <div className="featureGrid py-5">
+                    <article className="card">
+                        <div className="card-icon"><i className="ri-restaurant-line"></i></div>
+                        <h3 className="card-title">Healthy Nutrition</h3>
+                        <p className="card-text">High-quality, balanced meals that keep pets active and joyful.</p>
+                    </article>
+
+                    <article className="card">
+                        <div className="card-icon"><i className="ri-home-heart-line"></i></div>
+                        <h3 className="card-title">Safe Shelter</h3>
+                        <p className="card-text">Cloud-hostel service for comfortable, secure stays while owners are away.</p>
+                    </article>
+
+                    <article className="card">
+                        <div className="card-icon"><i className="ri-hand-heart-line"></i></div>
+                        <h3 className="card-title">Adoption Support</h3>
+                        <p className="card-text">We connect caring owners with pets to create lifelong bonds.</p>
+                    </article>
 
 
-   
+                </div>
+            </section>
+            {/* mission section end */}
+            
+
+
+
+
+
 
 
 

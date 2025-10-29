@@ -109,6 +109,11 @@ export default function ShopPage() {
                 Shop
               </Link>
             </li>
+            <li>
+                            <Link href="/adoption" className="nav-link">
+                                Adoption
+                            </Link>
+                        </li>
           </ul>
 
           {/* Login Button */}

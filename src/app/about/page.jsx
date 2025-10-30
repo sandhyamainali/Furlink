@@ -9,7 +9,7 @@ function AboutPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className=" container ">
+    <div className=" container-fluid ">
       {/* Navbar */}
       <nav className="nav">
                 <div className="nav-container ">
@@ -134,18 +134,7 @@ function AboutPage() {
         </div>
       </section>
 
-      {/* Footer Section */}
-      <footer className="footer">
-        <p>Subscribe to Our Newsletter</p>
-        <div>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="border px-3 py-2"
-          />
-          <button>Subscribe</button>
-        </div>
-      </footer>
+      
     </div>
   );
 }

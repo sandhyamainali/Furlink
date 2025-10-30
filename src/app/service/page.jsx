@@ -267,40 +267,7 @@ function ServicePage() {
         </Link>
       </section>
 
-      {/* Footer */}
-      <footer className="footer bg-white py-12">
-        <div className="text-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="font-bold text-gray-900 mb-3">Stay Connected</p>
-          <div className="mb-4 space-x-4">
-            <a href="#" aria-label="Facebook" className="text-indigo-600 hover:underline">Facebook</a> |{' '}
-            <a href="#" aria-label="Instagram" className="text-indigo-600 hover:underline">Instagram</a> |{' '}
-            <a href="#" aria-label="Twitter" className="text-indigo-600 hover:underline">Twitter</a>
-          </div>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert('Thank you for subscribing!');
-            }}
-            className="footerForm max-w-md mx-auto flex flex-col sm:flex-row gap-3"
-          >
-            <label htmlFor="email" className="sr-only">Email address</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="Your email"
-              required
-              className="footerInput flex-grow border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-            <button
-              type="submit"
-              className="footerButton bg-indigo-600 text-white px-5 py-2 rounded-md hover:bg-indigo-700 transition"
-            >
-              Subscribe
-            </button>
-          </form>
-          <p className="mt-8 text-gray-500">© 2025 Furlink. All rights reserved.</p>
-        </div>
-      </footer>
+     
     </div>
   );
 }

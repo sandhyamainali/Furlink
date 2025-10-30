@@ -178,32 +178,7 @@ export default function GalleryPage() {
       </main>
 
       {/* Footer */}
-      <footer
-        style={{
-          backgroundColor: '#f0f0f0',
-          padding: '30px 20px',
-          marginTop: '50px',
-          textAlign: 'center',
-          color: '#666',
-        }}
-        aria-label="Site Footer"
-      >
-        <div>
-          <p style={{ fontWeight: 'bold' }}>Stay Connected</p>
-          <div style={{ marginBottom: '10px' }}>
-            <a href="#" aria-label="Facebook" style={{ marginRight: '10px' }}>
-              Facebook
-            </a>
-            <a href="#" aria-label="Instagram" style={{ marginRight: '10px' }}>
-              Instagram
-            </a>
-            <a href="#" aria-label="Twitter">
-              Twitter
-            </a>
-          </div>
-          <p style={{ marginTop: '20px' }}>© 2025 Furlink. All rights reserved.</p>
-        </div>
-      </footer>
+     
     </>
   );
 }

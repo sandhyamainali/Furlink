@@ -100,7 +100,7 @@ export default function GalleryPage() {
                             </Link>
                         </li>
                         <li>
-                            <Link href="/adoption" className="nav-link">
+                            <Link href="/adopter" className="nav-link">
                                 Adoption
                             </Link>
                         </li>

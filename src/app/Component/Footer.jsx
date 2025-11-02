@@ -44,9 +44,9 @@ const Footer = () => {
         <div>
           <h4 className="footer-heading">Services</h4>
           <ul className="footer-links">
-            <li><a href="/adoption">Pet Adoption</a></li>
-            <li><a href="/adoption">Pet Fostering</a></li>
-            <li><a href="/adoption">Pet Care Support</a></li>
+            <li><a href="/adopter">Pet Adoption</a></li>
+            <li><a href="/adopter">Pet Fostering</a></li>
+            <li><a href="/adopter">Pet Care Support</a></li>
             <li><a href="#">Community Platform</a></li>
           </ul>
         </div>

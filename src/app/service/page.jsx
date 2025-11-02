@@ -132,7 +132,7 @@ function ServicePage() {
             <li><Link href="/gallery" className="nav-link hover:text-indigo-600">Gallery</Link></li>
             <li><Link href="/shop" className="nav-link hover:text-indigo-600">Shop</Link></li>
             <li>
-                            <Link href="/adoption" className="nav-link">
+                            <Link href="/adopter" className="nav-link">
                                 Adoption
                             </Link>
                         </li>

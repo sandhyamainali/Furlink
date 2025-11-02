@@ -124,10 +124,10 @@ export default function LoginPage() {
               </Link>
             </li>
             <li>
-                            <Link href="/adoption" className="nav-link">
-                                Adoption
-                            </Link>
-                        </li>
+              <Link href="/adopter" className="nav-link">
+                Adoption
+              </Link>
+            </li>
           </ul>
           <div>
             <button className="login-button">Log In</button>

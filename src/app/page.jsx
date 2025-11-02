@@ -11,8 +11,7 @@ const PetFoodWebsite = () => {
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // Data for the four steps in the "How Furlink Works" section, adjusted for the new image design
-    // The number circle is orange, the icon is blue/teal (text-blue-400), and there is NO surrounding border.
+    
     const howItWorksSteps = [
         {
             number: 1,
@@ -45,19 +44,19 @@ const PetFoodWebsite = () => {
     ];
     const testimonials = [
         {
-            name: "Sarah Johnson",
+            name: "Sarita",
             pet: "Adopted Max the Golden Retriever",
             feedback:
                 "Furlink helped me find Max, the perfect golden retriever for our family. The process was smooth and the caregivers were amazing!",
         },
         {
-            name: "Mike Chen",
+            name: "Mira",
             pet: "Adopted Luna the Persian Cat",
             feedback:
                 "When I had to relocate, Furlink helped me find a loving temporary home for Luna. She's thriving and I get regular updates!",
         },
         {
-            name: "Emma Davis",
+            name: "Pari",
             pet: "Adopted Buddy the Border Collie",
             feedback:
                 "The platform made it so easy to connect with local pet families. We adopted Buddy and couldn’t be happier!",
@@ -84,7 +83,7 @@ const PetFoodWebsite = () => {
                         <li><Link href="/contact" className="nav-link">Contact</Link></li>
                         <li><Link href="/gallery" className="nav-link">Gallery</Link></li>
                         <li><Link href="/shop" className="nav-link">Shop</Link></li>
-                        <li><Link href="/adoption" className="nav-link">Adoption</Link></li>
+                        <li><Link href="/adopter" className="nav-link">Adoption</Link></li>
                     </ul>
 
                     {/* Login Button */}

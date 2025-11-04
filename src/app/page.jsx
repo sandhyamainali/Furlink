@@ -11,7 +11,7 @@ const PetFoodWebsite = () => {
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    
+
     const howItWorksSteps = [
         {
             number: 1,
@@ -67,6 +67,7 @@ const PetFoodWebsite = () => {
 
     return (
         <div className="container-fluid">
+            
             {/* Navigation Header */}
             <nav className="nav">
                 <div className="nav-container ">
@@ -83,7 +84,7 @@ const PetFoodWebsite = () => {
                         <li><Link href="/contact" className="nav-link">Contact</Link></li>
                         <li><Link href="/gallery" className="nav-link">Gallery</Link></li>
                         <li><Link href="/shop" className="nav-link">Shop</Link></li>
-                        <li><Link href="/adopter" className="nav-link">Adoption</Link></li>
+                        <li><Link href="/adopter" className="nav-link">Adopter</Link></li>
                     </ul>
 
                     {/* Login Button */}
@@ -189,7 +190,7 @@ const PetFoodWebsite = () => {
 
 
             {/* Furlink Works start  */}
-  
+
             <section className="furlink-section">
                 <div className="furlink-container">
                     <h2 className="furlink-title">How Furlink Works</h2>

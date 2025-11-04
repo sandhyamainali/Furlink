@@ -52,7 +52,72 @@ nav {
   height: 4rem;
   
 }
+/* navbar responsive */
+.mobile-login {
+  display: none;
+}
 
+/* Mobile Menu Button */
+.mobile-menu-button {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #8b4513;
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nav-container {
+    flex-wrap: wrap;
+  }
+
+  /* Hide desktop menu initially */
+  .nav-menu {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background-color: #f9eae1;
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .nav-menu.active {
+    display: flex;
+  }
+
+  .nav-link {
+    font-size: 1.1rem;
+    padding: 10px 0;
+  }
+
+  /* Show mobile button */
+  .mobile-menu-button {
+    display: block;
+  }
+
+  /* Hide desktop login */
+  .desktop-login {
+    display: none;
+  }
+
+  /* Show mobile login inside menu */
+  .mobile-login {
+    display: block;
+    margin-top: 15px;
+  }
+}
+
+/* Menu & Close Icons */
+.menu-icon {
+  font-size: 28px;
+}
+
+.close-icon {
+  font-size: 32px;
+  line-height: 0;
+}
 .logo {
  
   padding: 1.5rem;
@@ -504,6 +569,56 @@ nav {
     transform: translateX(0);
   }
 }
+/* form css */
+.adoption-form-page {
+  background-color: #fef9f4;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.form-card {
+  max-width: 700px;
+  margin: 0 auto;
+  border-radius: 12px;
+  background-color: #fffaf5;
+}
+
+.form-label {
+  color: #5a4633;
+}
+
+.form-control {
+  background-color: #fff4e8;
+  border: 1px solid #e6ccb2;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.form-control:focus {
+  border-color: #ff8500;
+  box-shadow: 0 0 0 0.2rem rgba(255, 133, 0, 0.2);
+}
+
+.form-check-input:checked {
+  background-color: #ff8500;
+  border-color: #ff8500;
+}
+
+.submit-btn {
+  background-color: #ff8500;
+  color: white;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #e67400;
+}
+
 
 /* Focus states for accessibility */
 .nav-link:focus,
@@ -1305,4 +1420,91 @@ nav {
 .pet {
   font-size: 0.875rem;
   color: #a67856;
+}
+
+/* terms and condition  */
+.terms-section {
+  background-color: #f5e6d4;
+  min-height: 100vh;
+  padding: 4rem 1.5rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.terms-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 3rem 3.5rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease-in-out;
+}
+
+.terms-container:hover {
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+}
+
+.terms-title {
+  color: #8b4513;
+  font-size: 2.8rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: 0.5px;
+}
+
+.terms-paragraph {
+  color: #444;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  text-align: justify;
+  margin-bottom: 2rem;
+}
+
+.terms-block {
+  margin-bottom: 2rem;
+}
+
+.terms-block h2 {
+  color: #8b4513;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.terms-block p {
+  color: #555;
+  font-size: 1rem;
+  line-height: 1.7;
+  text-align: justify;
+}
+
+.highlight {
+  color: #8b4513;
+  font-weight: 600;
+}
+
+.underline {
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.underline:hover {
+  color: #a0522d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .terms-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .terms-title {
+    font-size: 2rem;
+  }
+
+  .terms-block h2 {
+    font-size: 1.3rem;
+  }
 }

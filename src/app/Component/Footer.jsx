@@ -2,6 +2,7 @@
 import React from "react";
 import { Facebook, Instagram, Linkedin, Mail } from "lucide-react";
 import Image from 'next/image';
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -10,10 +11,10 @@ const Footer = () => {
         {/* Brand Section */}
         <div>
           <div className="footer-brand">
-            
+
             <div className="logo">
-                                    <Image src="/img/logo.png" alt="Furlink Logo" width={90} height={90} />
-                                </div>
+             <Link href="/"> <Image src="/img/logo.png" alt="Furlink Logo" width={90} height={90} /> </Link>
+            </div>
             <h3 className="footer-title">Furlink</h3>
           </div>
 
@@ -36,6 +37,7 @@ const Footer = () => {
             <li><a href="/">Home</a></li>
             <li><a href="/about">About Us</a></li>
             <li><a href="/adoption">Pet Adoption</a></li>
+            <li><a href="/terms">Terms and Condition</a></li>
             <li><a href="/">How It Works</a></li>
           </ul>
         </div>
@@ -44,7 +46,7 @@ const Footer = () => {
         <div>
           <h4 className="footer-heading">Services</h4>
           <ul className="footer-links">
-            <li><a href="/adopter">Pet Adoption</a></li>
+            <li><a href="/adopter/adopt">Pet Adoption</a></li>
             <li><a href="/adopter">Pet Fostering</a></li>
             <li><a href="/adopter">Pet Care Support</a></li>
             <li><a href="#">Community Platform</a></li>
@@ -74,7 +76,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        © 2025 Furlink — All Rights Reserved. Made with ❤️ for pets and their families.
+        © 2025 Furlink — All Rights Reserved. 
       </div>
     </footer>
   );

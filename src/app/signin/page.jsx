@@ -120,7 +120,7 @@ export default function LoginPage() {
             </li>
             <li>
               <Link href="/shop" className="nav-link">
-                Shop
+                Shop 
               </Link>
             </li>
             <li>

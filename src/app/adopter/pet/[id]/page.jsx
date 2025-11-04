@@ -30,7 +30,7 @@ const getPetData = () => {
       adoptionFee: 200,
       caregiver: {
         id: 1,
-        name: 'Sarah Johnson',
+        name: 'Saraha ',
         status: 'Verified Dog Lover',
         rating: 4.9,
         reviews: 98,
@@ -60,7 +60,7 @@ const getPetData = () => {
       adoptionFee: 150,
       caregiver: {
         id: 1,
-        name: 'Sarah Johnson',
+        name: 'Saraha',
         status: 'Verified Cat Lover',
         rating: 4.9,
         reviews: 98,
@@ -90,7 +90,7 @@ const getPetData = () => {
       adoptionFee: 75,
       caregiver: {
         id: 2,
-        name: 'Mike Chen',
+        name: 'Mamta',
         status: 'Verified Pet Lover',
         rating: 4.7,
         reviews: 45,
@@ -106,7 +106,7 @@ const getPetData = () => {
       location: 'Portland, OR',
       status: 'Available',
       adoptionType: 'Permanent',
-      image: '/img/dog2.webp',
+      image: '/img/rabbit.jpg',
       about: 'Intelligent and active dog who loves outdoor activities and mental stimulation. Buddy is highly trainable and would excel in agility or obedience training. Great for active individuals or families.',
       temperament: ['Intelligent', 'Active', 'Trainable', 'Loyal'],
       reasonForAdoption: 'Owner can no longer provide adequate exercise due to health issues.',
@@ -120,7 +120,7 @@ const getPetData = () => {
       adoptionFee: 250,
       caregiver: {
         id: 3,
-        name: 'David Martinez',
+        name: 'David ',
         status: 'Verified Dog Lover',
         rating: 5.0,
         reviews: 127,
@@ -150,7 +150,7 @@ const getPetData = () => {
       adoptionFee: 120,
       caregiver: {
         id: 3,
-        name: 'David Martinez',
+        name: 'David',
         status: 'Verified Cat Lover',
         rating: 5.0,
         reviews: 127,
@@ -171,11 +171,11 @@ export default function PetProfilePage({ params }) {
   if (!pet) {
     return (
       <div>
-        <Navbar />
-        <div style={{ padding: '40px', textAlign: 'center' }}>
+       
+        {/* <div style={{ padding: '40px', textAlign: 'center' }}>
           <h1>Pet not found</h1>
           <Link href="/adopter">Back to adoption</Link>
-        </div>
+        </div> */}
       </div>
     );
   }
@@ -203,54 +203,91 @@ export default function PetProfilePage({ params }) {
   return (
     <div style={{ backgroundColor: '#fef9f4', minHeight: '100vh' }}>
       <nav className="nav">
-                <div className="nav-container ">
-                    {/* Logo */}
-                    <div className="logo">
-                        <Image src="/img/logo.png" alt="Furlink Logo" width={90} height={90} />
-                    </div>
+        <div className="nav-container ">
+          {/* Logo */}
+          <div className="logo">
+            <Image src="/img/logo.png" alt="Furlink Logo" width={90} height={90} />
+          </div>
 
-                    {/* Navigation Menu */}
-                    <ul className="nav-menu ">
-                        <li><Link href="/" className="nav-link active ">Home</Link></li>
-                        <li><Link href="/about" className="nav-link active">About</Link></li>
-                        <li><Link href="/service" className="nav-link active">Service</Link></li>
-                        <li><Link href="/contact" className="nav-link">Contact</Link></li>
-                        <li><Link href="/gallery" className="nav-link">Gallery</Link></li>
-                        <li><Link href="/shop" className="nav-link">Shop</Link></li>
-                        <li><Link href="/adopter" className="nav-link">Adoption</Link></li>
-                    </ul>
+          {/* Navigation Menu */}
+          <ul className="nav-menu ">
+            <li>
+              <Link href="/" className="nav-link active ">
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link href="/about" className="nav-link active">
+                About
+              </Link>
+            </li>
+            <li>
+              <Link href="/service" className="nav-link active">
+                Service
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact" className="nav-link">
+                Contact
+              </Link>
+            </li>
+            <li>
+              <Link href="/gallery" className="nav-link">
+                Gallery
+              </Link>
+            </li>
+            <li>
+              <Link href="/shop" className="nav-link">
+                Shop <span> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart-icon lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></span>
+              </Link>
+            </li>
+            <li>
+              <Link href="/adopter" className="nav-link">
+                Adoption
+              </Link>
+            </li>
+          </ul>
 
-                    {/* Login Button */}
-                    <div>
-                        <Link href="/login">
-                            <button className="login-button">Log In</button>
-                        </Link>
-                    </div>
+          {/* Login Button */}
+          <div>
+            <Link href="/login">
+              <button className="login-button">
+                Log In
+              </button>
+            </Link>
+          </div>
 
-                    {/* Mobile menu button */}
-                    <button
-                        className="mobile-menu-button"
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    >
-                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
-                </div>
-            </nav>
+          {/* Mobile menu button */}
+          <button
+            className="mobile-menu-button"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </nav>
       
       <div style={{ padding: '20px' }}>
         <Link 
           href="/adopter" 
           style={{ 
-            color: '#666', 
+            color: '#a0632b', 
             textDecoration: 'none', 
-            fontSize: '14px',
-            display: 'inline-block',
-            marginBottom: '20px'
+            fontSize: '16px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginBottom: '20px',
+            padding: '10px 14px',
+            background: '#fff',
+            borderRadius: '12px',
+            border: '1px solid #f0e1cf'
           }}
         >
-          ← Back to adoption
+          <span style={{ fontSize: '18px' }}>←</span>
+          Back to Adoption
         </Link>
 
         <div style={{ 
@@ -283,7 +320,7 @@ export default function PetProfilePage({ params }) {
                   position: 'absolute', 
                   top: '15px', 
                   left: '15px',
-                  backgroundColor: '#4caf50',
+                  backgroundColor: '#1fb6aa',
                   color: 'white',
                   padding: '6px 14px',
                   borderRadius: '20px',
@@ -298,7 +335,7 @@ export default function PetProfilePage({ params }) {
                   position: 'absolute', 
                   top: '15px', 
                   right: '15px',
-                  backgroundColor: '#ff8500',
+                  backgroundColor: '#ff8a3d',
                   color: 'white',
                   padding: '6px 14px',
                   borderRadius: '20px',
@@ -538,11 +575,11 @@ export default function PetProfilePage({ params }) {
                 gap: '12px',
                 marginBottom: '30px'
               }}>
-                <Link href="/chat" style={{ width: '100%', textDecoration: 'none' }}>
+                <Link href={`/adopter/pet/${pet.id}/adopt`} style={{ width: '100%', textDecoration: 'none' }}>
                   <button
                     style={{
                       width: '100%',
-                      backgroundColor: '#ff8500',
+                      backgroundColor: '#ff8a3d',
                       color: 'white',
                       padding: '14px 20px',
                       borderRadius: '8px',
@@ -553,10 +590,10 @@ export default function PetProfilePage({ params }) {
                     }}
                     type="button"
                   >
-                    Adopt {pet.name}
+                    ❤  Request to Adopt
                   </button>
                 </Link>
-                <Link href="/chat" style={{ width: '100%', textDecoration: 'none' }}>
+                <Link href={`/adopter/pet/${pet.id}/contact`} style={{ width: '100%', textDecoration: 'none' }}>
                   <button
                     style={{
                       width: '100%',
@@ -564,7 +601,7 @@ export default function PetProfilePage({ params }) {
                       color: '#333',
                       padding: '14px 20px',
                       borderRadius: '8px',
-                      border: '1px solid #ddd',
+                      border: '1px solid #e6e6e6',
                       cursor: 'pointer',
                       fontSize: '16px',
                       fontWeight: '500',
@@ -575,8 +612,8 @@ export default function PetProfilePage({ params }) {
                     }}
                     type="button"
                   >
-                    <span>✓</span>
-                    Contact caregiver
+                    <span>💬</span>
+                    Contact Caregiver
                   </button>
                 </Link>
               </div>
@@ -599,12 +636,8 @@ export default function PetProfilePage({ params }) {
                     margin: 0,
                     fontWeight: '600'
                   }}>
-                    Caregiver
+                    Caregiver <span style={{ fontSize: '16px', color: '#35b7ff' }}>🛡️</span>
                   </h3>
-                  <span style={{ 
-                    fontSize: '16px', 
-                    color: '#4caf50' 
-                  }}>✓</span>
                 </div>
                 <Link href={`/caregiver/${pet.caregiver.id}`} style={{ textDecoration: 'none' }}>
                   <div style={{ 
@@ -622,7 +655,7 @@ export default function PetProfilePage({ params }) {
                   fontSize: '14px',
                   marginBottom: '12px'
                 }}>
-                  {pet.caregiver.status}
+                  ✓ Verified Caregiver
                 </div>
                 <div style={{ 
                   display: 'flex', 
@@ -637,6 +670,9 @@ export default function PetProfilePage({ params }) {
                   }}>
                     {pet.caregiver.rating} ({pet.caregiver.reviews} reviews)
                   </span>
+                </div>
+                <div style={{ color: '#666', fontSize: '14px', marginBottom: '12px' }}>
+                  Member since 2022
                 </div>
                 <p style={{ 
                   color: '#666', 

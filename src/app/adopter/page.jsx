@@ -79,14 +79,14 @@ function AdoptPage() {
 
   return (
     <div>
-      <nav className="nav">
+      {/* <nav className="nav">
         <div className="nav-container ">
-          {/* Logo */}
+       
           <div className="logo">
             <Image src="/img/logo.png" alt="Furlink Logo" width={90} height={90} />
           </div>
 
-          {/* Navigation Menu */}
+         
           <ul className="nav-menu ">
             <li>
               <Link href="/" className="nav-link active ">
@@ -125,7 +125,7 @@ function AdoptPage() {
             </li>
           </ul>
 
-          {/* Login Button */}
+        
           <div>
             <Link href="/login">
               <button className="login-button">
@@ -134,7 +134,7 @@ function AdoptPage() {
             </Link>
           </div>
 
-          {/* Mobile menu button */}
+          
           <button
             className="mobile-menu-button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -144,7 +144,7 @@ function AdoptPage() {
             </svg>
           </button>
         </div>
-      </nav>
+      </nav> */}
       
       <section
         style={{
@@ -159,7 +159,7 @@ function AdoptPage() {
           </p>
 
           <div style={{ display: 'flex', gap: '10px', marginBottom: '30px' }}>
-            <button
+           <button
               onClick={() => setActiveTab('adopt')}
               style={{
                 padding: '12px 24px',

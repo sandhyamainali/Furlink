@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebookF } from "react-icons/fa";
 import Link from "next/link";
@@ -7,14 +7,14 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [remember, setRemember] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
+        const [email, setEmail] = useState("");
+        const [password, setPassword] = useState("");
+        const [remember, setRemember] = useState(false);
+        const [isLoading, setIsLoading] = useState(false);
+        const [error, setError] = useState("");
 
-    const router = useRouter();
-
+        const router = useRouter();
+        const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     // Handle form submit for email/password login
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,21 +22,46 @@ export default function LoginPage() {
         setIsLoading(true);
 
         try {
-            // TODO: Replace with your authentication API call
-            // Simulate API call delay
-            await new Promise((r) => setTimeout(r, 1500));
-
-            // Simple validation example
             if (!email || !password) {
-                throw new Error("Please enter email and password.");
+                setError("Please enter email and password.");
+                return;
             }
-            // Simulate successful login
-            console.log("Logging in with", { email, password, remember });
 
-            // Redirect or update UI after successful login
-            router.push("/dashboard"); // example redirect after login
+            const res = await fetch('https://furlink-backend.vercel.app/auth/login/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok) {
+                // Handle validation/errors from backend
+                // Example: { non_field_errors: ["Invalid email or password"] }
+                const msg = (data && (data.non_field_errors?.[0] || data.detail || data.error)) || 'Login failed';
+                setError(msg);
+                return;
+            }
+
+            // Expecting { access, refresh }
+            if (data.access && data.refresh) {
+                try {
+                    localStorage.setItem('access', data.access);
+                    localStorage.setItem('refresh', data.refresh);
+                } catch (storageErr) {
+                    console.error('Failed to save tokens to localStorage', storageErr);
+                }
+                // Optionally set a flag
+                try { localStorage.setItem('isAuthenticated', 'true'); } catch {}
+
+                // Redirect after successful login
+                router.push('/profile');
+            } else {
+                setError('Unexpected response from server');
+            }
         } catch (err) {
-            setError(err.message || "Login failed. Please try again.");
+            console.error('Login error', err);
+            setError(err.message || 'Login failed. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -52,141 +77,7 @@ export default function LoginPage() {
     return (
         <>
             {/* Navigation Header */}
-            <nav className="nav">
-                <div className="nav-container ">
-                    {/* Logo */}
-                    <div className="logo">
-                        <Image src="/img/logo.png" alt="Furlink Logo" width={90} height={90} />
-                    </div>
-
-                    {/* Navigation Menu */}
-                    <ul className="nav-menu ">
-                        <li>
-                            <Link href="/" className="nav-link active ">
-                                Home
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/about" className="nav-link active">
-                                About
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/service" className="nav-link active">
-                                Service
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/contact" className="nav-link">
-                                Contact
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/gallery" className="nav-link">
-                                Gallery
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/shop" className="nav-link">
-                                Shop <nav className="nav">
-            <div className="nav-container ">
-              {/* Logo */}
-              <div className="logo">
-                <Image src="/img/logo.png" alt="Furlink Logo" width={90} height={90} />
-              </div>
-      
-              {/* Navigation Menu */}
-              <ul className="nav-menu ">
-                <li>
-                  <Link href="/" className="nav-link active ">
-                    Home
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/about" className="nav-link active">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/service" className="nav-link active">
-                    Service
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="nav-link">
-                    Contact
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/gallery" className="nav-link">
-                    Gallery
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/shop" className="nav-link">
-                    Shop <span> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart-icon lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/adopter" className="nav-link">
-                    Adoption
-                  </Link>
-                </li>
-              </ul>
-      
-              {/* Login Button */}
-              <div>
-                <Link href="/login">
-                  <button className="login-button">
-                    Log In
-                  </button>
-                </Link>
-              </div>
-      
-              {/* Mobile menu button */}
-              <button
-                className="mobile-menu-button"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              >
-                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-            </div>
-          </nav>
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/adopter" className="nav-link">
-                                Adoption
-                            </Link>
-                        </li>
-                    </ul>
-
-                    {/* Login Button */}
-                    <div>
-                        <Link href="/login">
-                            <button className="login-button">
-                                Log In
-                            </button>
-                        </Link>
-                    </div>
-
-                    {/* Mobile menu button */}
-                    <button className="mobile-menu-button" aria-label="Toggle menu">
-                        <svg
-                            width="24"
-                            height="24"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            aria-hidden="true"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
-                </div>
-            </nav>
+            
 
             {/* Main Content centered */}
             <main

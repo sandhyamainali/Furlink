@@ -1,143 +1,93 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/cartContext";
 
-const productCategories = [
-  "All Products",
-  "Food",
-  "Toys",
-  "Grooming",
-  "Training",
-  "Accessories",
-];
-
-const products = [
-  {
-    id: 1,
-    name: "Premium Dog Food",
-    category: "Food",
-    price: "$30",
-    description: "Nutritious and balanced meal for your dog.",
-  },
-  {
-    id: 2,
-    name: "Cat Toy Mouse",
-    category: "Toys",
-    price: "$10",
-    description: "Fun and engaging toy for your cat.",
-  },
-  {
-    id: 3,
-    name: "Pet Shampoo",
-    category: "Grooming",
-    price: "$15",
-    description: "Gentle shampoo for a shiny coat.",
-  },
-  {
-    id: 4,
-    name: "Training Clicker",
-    category: "Training",
-    price: "$8",
-    description: "Effective tool for training your pet.",
-  },
-  {
-    id: 5,
-    name: "Dog Collar",
-    category: "Accessories",
-    price: "$12",
-    description: "Comfortable and durable collar for dogs.",
-  },
-];
+const API_BASE = "https://furlink-backend.vercel.app";
 
 export default function ShopPage() {
-  const [selectedCategory, setSelectedCategory] = useState("All Products");
+  const [categories, setCategories] = useState([]); // {id,name}
+  const [products, setProducts] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+  const [error, setError] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const router = useRouter();
   const { addToCart } = useCart();
 
-  const filteredProducts =
-    selectedCategory === "All Products"
-      ? products
-      : products.filter((p) => p.category === selectedCategory);
+  useEffect(() => {
+    let mounted = true;
+    async function fetchCategories() {
+      setIsLoadingCategories(true);
+      setError(null);
+      try {
+        const res = await fetch(`${API_BASE}/shop/categories/`);
+        if (!res.ok) throw new Error(`Categories fetch failed: ${res.status}`);
+        const data = await res.json();
+        // Expecting an array of {id, name} or similar
+        if (!mounted) return;
+        if (Array.isArray(data)) setCategories(data);
+        else if (data && Array.isArray(data.results)) setCategories(data.results);
+        else setCategories([]);
+      } catch (err) {
+        console.error(err);
+        if (mounted) setError('Failed to load categories');
+      } finally {
+        if (mounted) setIsLoadingCategories(false);
+      }
+    }
+
+    fetchCategories();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    async function fetchProducts() {
+      setIsLoadingProducts(true);
+      setError(null);
+      try {
+        const res = await fetch(`${API_BASE}/shop/products/`);
+        if (!res.ok) throw new Error(`Products fetch failed: ${res.status}`);
+        const data = await res.json();
+        if (!mounted) return;
+        if (Array.isArray(data)) setProducts(data);
+        else if (data && Array.isArray(data.results)) setProducts(data.results);
+        else setProducts([]);
+      } catch (err) {
+        console.error(err);
+        if (mounted) setError('Failed to load products');
+      } finally {
+        if (mounted) setIsLoadingProducts(false);
+      }
+    }
+
+    fetchProducts();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const handleAddToCart = (product) => {
     addToCart(product);
     router.push("/cart");
   };
 
+  // Filter products by selected category id (or show all)
+  const filteredProducts =
+    selectedCategory === "all"
+      ? products
+      : products.filter((p) => String(p.category) === String(selectedCategory));
+
   return (
-
     <div style={{ fontFamily: "Arial, sans-serif", padding: "20px" }}>
-      <nav className="nav">
-        <div className="nav-container ">
-          {/* Logo */}
-          <div className="logo">
-            <Image src="/img/logo.png" alt="Furlink Logo" width={90} height={90} />
-          </div>
-
-          {/* Navigation Menu */}
-          <ul className="nav-menu ">
-            <li>
-              <Link href="/" className="nav-link  ">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link href="/about" className="nav-link ">
-                About
-              </Link>
-            </li>
-            <li>
-              <Link href="/service" className="nav-link ">
-                Service
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="nav-link">
-                Contact
-              </Link>
-            </li>
-            <li>
-              <Link href="/gallery" className="nav-link">
-                Gallery
-              </Link>
-            </li>
-            <li>
-              <Link href="/shop" className="nav-link">
-                Shop <span> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart-icon lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></span>
-              </Link>
-            </li>
-            <li>
-                            <Link href="/adopter" className="nav-link">
-                                Adoption
-                            </Link>
-                        </li>
-          </ul>
-
-          {/* Login Button */}
-          <div>
-            <Link href="/login">
-              <button className="login-button">
-                Log In
-              </button>
-            </Link>
-          </div>
-
-          {/* Mobile menu button */}
-          <button
-            className="mobile-menu-button"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
-      </nav>
-      {/* ... your existing header and navigation code ... */}
-
+     
       {/* Shop Filter Dropdown */}
       <section style={{ marginTop: "50px" }}>
         <label
@@ -152,13 +102,21 @@ export default function ShopPage() {
           onChange={(e) => setSelectedCategory(e.target.value)}
           style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
         >
-          {productCategories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
+          <option value="all">All Products</option>
+          {isLoadingCategories ? (
+            <option value="loading" disabled>Loading...</option>
+          ) : (
+            categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))
+          )}
         </select>
       </section>
+
+      {/* Errors / Loading */}
+      {error && (
+        <div style={{ color: 'red', marginTop: 12 }}>{error}</div>
+      )}
 
       {/* Products Grid */}
       <section
@@ -169,37 +127,65 @@ export default function ShopPage() {
           gap: "20px",
         }}
       >
-        {filteredProducts.map(({ id, name, price, description }) => (
-          <div
-            key={id}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: "10px",
-              padding: "20px",
-              backgroundColor: "#fff",
-              boxShadow: "0 1px 6px rgba(0,0,0,0.1)",
-            }}
-          >
-            <h3 style={{ marginTop: 0 }}>{name}</h3>
-            <p style={{ color: "#777" }}>{description}</p>
-            <p style={{ fontWeight: "bold", marginTop: "10px" }}>{price}</p>
-            <button
-              onClick={() => handleAddToCart({ id, name, price })}
+        {isLoadingProducts ? (
+          <div>Loading products...</div>
+        ) : filteredProducts.length === 0 ? (
+          <div style={{ gridColumn: '1/-1', textAlign: 'center', color: '#666' }}>No products found.</div>
+        ) : (
+          filteredProducts.map((p) => (
+            <div
+              key={p.id}
               style={{
-                marginTop: "15px",
-                backgroundColor: "#d8a276",
-                border: "none",
-                padding: "10px",
-                borderRadius: "6px",
-                color: "#fff",
-                cursor: "pointer",
-                width: "100%",
+                border: "1px solid #ddd",
+                borderRadius: "10px",
+                padding: "20px",
+                backgroundColor: "#fff",
+                boxShadow: "0 1px 6px rgba(0,0,0,0.1)",
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
-              Add to Cart
-            </button>
-          </div>
-        ))}
+              <div style={{ marginBottom: 12, textAlign: 'center' }}>
+                {p.image ? (
+                  // use plain img to avoid next/image external domain config
+                  <img src={p.image} alt={p.name} style={{ maxWidth: '100%', maxHeight: 180, objectFit: 'cover', borderRadius: 8 }} />
+                ) : (
+                  <div style={{ width: '100%', height: 160, background: '#f0f0f0', borderRadius: 8 }} />
+                )}
+              </div>
+
+              <h3 style={{ marginTop: 0 }}>{p.name}</h3>
+              <p style={{ color: "#777", flex: 1 }}>{p.description}</p>
+              <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  {p.discount_price && p.discount_price !== p.price ? (
+                    <div>
+                      <span style={{ textDecoration: 'line-through', color: '#999', marginRight: 8 }}>${p.price}</span>
+                      <span style={{ fontWeight: 'bold', color: '#cc4400' }}>${p.discount_price}</span>
+                    </div>
+                  ) : (
+                    <span style={{ fontWeight: 'bold' }}>${p.price}</span>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => handleAddToCart(p)}
+                  style={{
+                    marginTop: 0,
+                    backgroundColor: "#d8a276",
+                    border: "none",
+                    padding: "10px",
+                    borderRadius: "6px",
+                    color: "#fff",
+                    cursor: "pointer",
+                  }}
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </section>
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useUser } from "@/context/userContext";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebookF } from "react-icons/fa";
 import Link from "next/link";
@@ -9,6 +10,7 @@ import { useRouter } from "next/navigation";
 export default function LoginPage() {
         const [email, setEmail] = useState("");
         const [password, setPassword] = useState("");
+    const { setUser } = useUser();
         const [remember, setRemember] = useState(false);
         const [isLoading, setIsLoading] = useState(false);
         const [error, setError] = useState("");
@@ -27,10 +29,12 @@ export default function LoginPage() {
                 return;
             }
 
-            const res = await fetch('https://furlink-backend.vercel.app/auth/login/', {
+            const API_BASE = "https://furlink-backend.vercel.app";
+
+            const res = await fetch(`${API_BASE}/auth/login/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email, password })
             });
 
             const data = await res.json().catch(() => ({}));
@@ -53,6 +57,49 @@ export default function LoginPage() {
                 }
                 // Optionally set a flag
                 try { localStorage.setItem('isAuthenticated', 'true'); } catch {}
+
+                // Redirect after successful login
+                // Try to set user info in context/localStorage.
+                let userObj = data.user || data.profile || data.user_profile || null;
+                if (!userObj) {
+                    // attempt to fetch profile endpoint with access token
+                    try {
+                        const profileRes = await fetch(`${API_BASE}/auth/user/`, {
+                            headers: { Authorization: `Bearer ${data.access}` },
+                        });
+                        if (profileRes.ok) {
+                            const profileData = await profileRes.json().catch(() => null);
+                            if (profileData) userObj = profileData;
+                        } else {
+                            // try alternative endpoint
+                            const alt = await fetch(`${API_BASE}/auth/profile/`, {
+                                headers: { Authorization: `Bearer ${data.access}` },
+                            }).catch(() => null);
+                            if (alt && alt.ok) {
+                                const altJson = await alt.json().catch(() => null);
+                                if (altJson) userObj = altJson;
+                            }
+                        }
+                    } catch (e) {
+                        // ignore profile fetch errors
+                        console.warn('Could not fetch profile after login', e);
+                    }
+                }
+
+                // If still no profile object, create a minimal user object from the email so UI treats user as logged in
+                if (!userObj) {
+                    userObj = { email };
+                }
+
+                if (userObj) {
+                    try {
+                        setUser(userObj);
+                        // userContext will persist to localStorage (furlink_user)
+                    } catch (e) {
+                        // As a fallback, write directly to localStorage
+                        try { localStorage.setItem('furlink_user', JSON.stringify(userObj)); } catch {}
+                    }
+                }
 
                 // Redirect after successful login
                 router.push('/profile');

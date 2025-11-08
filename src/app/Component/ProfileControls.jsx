@@ -1,28 +1,45 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useCart } from "@/context/cartContext";
+import { useUser } from "@/context/userContext";
 import { FaShoppingCart } from "react-icons/fa";
 
 export default function ProfileControls() {
-  const { cartItems } = useCart();
-  const cartCount = cartItems.reduce((s, i) => s + (i.quantity || 1), 0);
+  const { user, isAuthenticated } = useUser();
+  console.log('ProfileControls: user:', user, 'isAuthenticated:', isAuthenticated);
+  const profileSrc = user?.profile_picture || user?.avatar || user?.photo || user?.image || null;
+
+  const handleLogoutClick = () => {
+    console.log('ProfileControls: Logout button clicked');
+  };
 
   return (
-    <div className="flex items-center gap-4 flex-row">
-      {/* Profile button */}
-      <Link href="/profile">
-        <button className="login-button">Profile</button>
-      </Link>
-
-      {/* Cart icon button */}
-      <Link href="/cart" className="relative inline-flex items-center justify-center">
-        <FaShoppingCart size={20} className="text-gray-700" />
-        {cartCount > 0 && (
-          <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
-            {cartCount}
-          </span>
-        )}
-      </Link>
+    <div className="flex items-center ">
+      {isAuthenticated ? (
+        <div className=" profile  items-center ">
+          <div className="flex items-center space-x-2">
+            <Link href="/logout">
+              <button className="login-button text-sm " onClick={handleLogoutClick}>Logout</button>
+            </Link>
+          </div>
+          <div>
+            <Link href="/profile" className="items-center ml-1">
+              {profileSrc ? (
+                <Image src={profileSrc} alt="profile" width={40} height={40} style={{ borderRadius: 9999 }} />
+              ) : (
+                <div style={{ width: 28, height: 28, borderRadius: 9999, background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ color: '#666', fontWeight: 700, fontSize: '12px' }}>U</span>
+                </div>
+              )}
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <Link href="/login">
+          <button className="login-button text-sm py-1 px-3">Login</button>
+        </Link>
+      )}
     </div>
   );
 }

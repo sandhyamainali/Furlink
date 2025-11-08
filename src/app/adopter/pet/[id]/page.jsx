@@ -1,181 +1,92 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-// Pet data with full profile details
-const getPetData = () => {
-  const pets = [
-    {
-      id: 1,
-      name: 'Max',
-      type: 'Dog',
-      breed: 'Golden Retriever',
-      age: '2 years',
-      location: 'San Francisco, CA',
-      status: 'Available',
-      adoptionType: 'Permanent',
-      image: '/img/dog1.jpeg',
-      about: 'a friendly and energetic golden retriever who loves playing fetch and swimming. Max has been with our family for 2 years but we\'re relocating internationally and can\'t take him with us. Max is great with children of all ages and gets along well with other dogs. He\'s fully house-trained, knows basic commands (sit, stay, come, down), and loves going on hikes and beach walks.',
-      temperament: ['Friendly', 'Energetic', 'Good with kids', 'Social'],
-      reasonForAdoption: 'International relocation - cannot take pets.',
-      specialRequirements: 'Active family preferred, access to yard or regular exercise.',
-      healthInfo: {
-        vaccinated: true,
-        microchipped: true,
-        spayedNeutered: true,
-        healthIssues: 'None known'
-      },
-      adoptionFee: 200,
-      caregiver: {
-        id: 1,
-        name: 'Saraha ',
-        status: 'Verified Dog Lover',
-        rating: 4.9,
-        reviews: 98,
-        description: 'Loving pet owner who values human-pet connections. I\'m looking for a loving home for Max.'
-      }
-    },
-    {
-      id: 2,
-      name: 'Luna',
-      type: 'Cat',
-      breed: 'Persian',
-      age: '2 years',
-      location: 'Los Angeles, CA',
-      status: 'Available',
-      adoptionType: 'Temporary',
-      image: '/img/cat1.jpg',
-      about: 'Gentle and affectionate Persian cat, prefers quiet and calm environments. Perfect for seniors or families with older children. Luna enjoys being petted and lounging in sunny spots.',
-      temperament: ['Calm', 'Affectionate', 'Quiet', 'Gentle'],
-      reasonForAdoption: 'Temporary care needed due to family emergency.',
-      specialRequirements: 'Quiet home environment preferred.',
-      healthInfo: {
-        vaccinated: true,
-        microchipped: true,
-        spayedNeutered: true,
-        healthIssues: 'None known'
-      },
-      adoptionFee: 150,
-      caregiver: {
-        id: 1,
-        name: 'Saraha',
-        status: 'Verified Cat Lover',
-        rating: 4.9,
-        reviews: 98,
-        description: 'Experienced cat owner looking for temporary care for Luna.'
-      }
-    },
-    {
-      id: 3,
-      name: 'Snowball',
-      type: 'Rabbit',
-      breed: 'Holland Lop',
-      age: '1 year',
-      location: 'Seattle, WA',
-      status: 'Available',
-      adoptionType: 'Permanent',
-      image: '/img/dog2.webp',
-      about: 'Snowball is a sweet rabbit who loves fresh vegetables and gentle handling. Great pet for families with children who understand how to handle small animals carefully.',
-      temperament: ['Gentle', 'Playful', 'Curious', 'Friendly'],
-      reasonForAdoption: 'Moving to a place that doesn\'t allow pets.',
-      specialRequirements: 'Regular fresh vegetables, spacious cage, daily exercise time.',
-      healthInfo: {
-        vaccinated: false,
-        microchipped: false,
-        spayedNeutered: true,
-        healthIssues: 'None known'
-      },
-      adoptionFee: 75,
-      caregiver: {
-        id: 2,
-        name: 'Mamta',
-        status: 'Verified Pet Lover',
-        rating: 4.7,
-        reviews: 45,
-        description: 'Responsible pet owner looking for a good home for Snowball.'
-      }
-    },
-    {
-      id: 4,
-      name: 'Buddy',
-      type: 'Dog',
-      breed: 'Australian Shepherd',
-      age: '2 years',
-      location: 'Portland, OR',
-      status: 'Available',
-      adoptionType: 'Permanent',
-      image: '/img/rabbit.jpg',
-      about: 'Intelligent and active dog who loves outdoor activities and mental stimulation. Buddy is highly trainable and would excel in agility or obedience training. Great for active individuals or families.',
-      temperament: ['Intelligent', 'Active', 'Trainable', 'Loyal'],
-      reasonForAdoption: 'Owner can no longer provide adequate exercise due to health issues.',
-      specialRequirements: 'Active lifestyle, regular exercise and mental stimulation required.',
-      healthInfo: {
-        vaccinated: true,
-        microchipped: true,
-        spayedNeutered: true,
-        healthIssues: 'None known'
-      },
-      adoptionFee: 250,
-      caregiver: {
-        id: 3,
-        name: 'David ',
-        status: 'Verified Dog Lover',
-        rating: 5.0,
-        reviews: 127,
-        description: 'Passionate about finding the right home for every dog.'
-      }
-    },
-    {
-      id: 5,
-      name: 'Whiskers',
-      type: 'Cat',
-      breed: 'Tabby',
-      age: '4 years',
-      location: 'San Diego, CA',
-      status: 'Adopted',
-      adoptionType: 'Permanent',
-      image: '/img/cat2.jpg',
-      about: 'Lovable tabby cat with playful personality. Whiskers enjoys interactive toys and cuddling with humans.',
-      temperament: ['Playful', 'Affectionate', 'Curious', 'Independent'],
-      reasonForAdoption: 'Owner moving abroad.',
-      specialRequirements: 'Interactive toys, regular playtime.',
-      healthInfo: {
-        vaccinated: true,
-        microchipped: true,
-        spayedNeutered: true,
-        healthIssues: 'None known'
-      },
-      adoptionFee: 120,
-      caregiver: {
-        id: 3,
-        name: 'David',
-        status: 'Verified Cat Lover',
-        rating: 5.0,
-        reviews: 127,
-        description: 'Caring owner looking for loving homes for pets.'
-      }
-    }
-  ];
-  return pets;
-};
+// Client-side fetch for single pet detail (authenticated)
 
 
 
 export default function PetProfilePage({ params }) {
-  const pets = getPetData();
-  const petId = parseInt(params.id);
-  const pet = pets.find(p => p.id === petId);
+  const router = useRouter();
+
+  const [pet, setPet] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPet = async () => {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
+      if (!token) {
+        router.replace('/login');
+        return;
+      }
+
+      const API_BASE = 'https://furlink-backend.vercel.app';
+      try {
+        const res = await fetch(`${API_BASE}/pet/pets/${params.id}/`, {
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
+        });
+        if (res.status === 401 || res.status === 403) {
+          router.replace('/login');
+          return;
+        }
+        if (!res.ok) throw new Error(`API error ${res.status}`);
+        const data = await res.json();
+
+        // Normalize response to the fields used by the UI
+        const normalized = {
+          id: data.id,
+          name: data.name || data.title || '',
+          breed: data.breed || data.species || '',
+          type: data.species || data.type || '',
+          age: data.age || data.years || '',
+          location: data.location || '',
+          description: data.description || data.about || '',
+          adoptionFee: data.adoption_price || data.custom_price || data.price || null,
+          image: data.photo || data.image || '/img/pet-placeholder.jpg',
+          isAvailable: typeof data.is_available_for_adoption !== 'undefined' ? data.is_available_for_adoption : true,
+          owner: data.owner_username || null,
+          raw: data
+        };
+
+        setPet(normalized);
+      } catch (err) {
+        console.error('Fetch pet error', err);
+        setError(err.message || 'Failed to load pet');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPet();
+  }, [params.id, router]);
+
+  if (loading) {
+    return (
+      <div style={{ padding: 40, textAlign: 'center' }}>
+        <h2 style={{ fontSize: 20, marginBottom: 8 }}>Loading pet…</h2>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: 40, textAlign: 'center' }}>
+        <h2 style={{ fontSize: 20, marginBottom: 8 }}>Unable to load pet</h2>
+        <p style={{ color: '#666' }}>{error}</p>
+        <Link href="/login" style={{ color: '#a0632b', marginTop: 12, display: 'inline-block' }}>Login</Link>
+      </div>
+    );
+  }
 
   if (!pet) {
     return (
-      <div>
-       
-        {/* <div style={{ padding: '40px', textAlign: 'center' }}>
-          <h1>Pet not found</h1>
-          <Link href="/adopter">Back to adoption</Link>
-        </div> */}
+      <div style={{ padding: 40, textAlign: 'center' }}>
+        <h2 style={{ fontSize: 20 }}>Pet not found</h2>
+        <Link href="/adopter" style={{ color: '#a0632b', marginTop: 12, display: 'inline-block' }}>Back to Adoption</Link>
       </div>
     );
   }
@@ -250,7 +161,7 @@ export default function PetProfilePage({ params }) {
                 fill
                 style={{ objectFit: 'cover' }}
               />
-              {pet.status === 'Available' && (
+              {pet.isAvailable && (
                 <div style={{ 
                   position: 'absolute', 
                   top: '15px', 
@@ -265,7 +176,7 @@ export default function PetProfilePage({ params }) {
                   Available
                 </div>
               )}
-              {pet.adoptionType === 'Permanent' && (
+              {pet.raw?.adoption_type && (
                 <div style={{ 
                   position: 'absolute', 
                   top: '15px', 
@@ -277,7 +188,7 @@ export default function PetProfilePage({ params }) {
                   fontSize: '14px',
                   fontWeight: '500'
                 }}>
-                  Permanent
+                  {pet.raw.adoption_type}
                 </div>
               )}
             </div>
@@ -332,11 +243,12 @@ export default function PetProfilePage({ params }) {
                 lineHeight: '1.6',
                 margin: 0
               }}>
-                {pet.about}
+                {pet.description}
               </p>
             </div>
 
             {/* Temperament Section */}
+            {pet.raw?.temperament && pet.raw.temperament.length > 0 && (
             <div style={{ marginBottom: '30px' }}>
               <h2 style={{ 
                 fontSize: '1.5rem', 
@@ -351,7 +263,7 @@ export default function PetProfilePage({ params }) {
                 flexWrap: 'wrap', 
                 gap: '10px'
               }}>
-                {pet.temperament.map((trait, index) => (
+                {pet.raw.temperament.map((trait, index) => (
                   <span
                     key={index}
                     style={{
@@ -369,6 +281,7 @@ export default function PetProfilePage({ params }) {
                 ))}
               </div>
             </div>
+            )}
 
             {/* Reason for Adoption */}
             <div style={{ marginBottom: '30px' }}>
@@ -386,7 +299,7 @@ export default function PetProfilePage({ params }) {
                 lineHeight: '1.6',
                 margin: 0
               }}>
-                {pet.reasonForAdoption}
+                {pet.raw?.reason_for_adoption || pet.raw?.reasonForAdoption || ''}
               </p>
             </div>
 
@@ -406,69 +319,31 @@ export default function PetProfilePage({ params }) {
                 lineHeight: '1.6',
                 margin: 0
               }}>
-                {pet.specialRequirements}
+                {pet.raw?.special_requirements || pet.raw?.specialRequirements || ''}
               </p>
             </div>
 
-            {/* Health Information */}
-            <div style={{ marginBottom: '30px' }}>
-              <h2 style={{ 
-                fontSize: '1.5rem', 
-                color: '#333', 
-                margin: '0 0 15px 0',
-                fontWeight: '600'
-              }}>
-                Health Information
-              </h2>
-              <div style={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                gap: '12px',
-                marginBottom: '15px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  {pet.healthInfo.vaccinated ? (
-                    <span style={{ fontSize: '18px', color: '#4caf50' }}>✓</span>
-                  ) : (
-                    <span style={{ fontSize: '18px', color: '#ccc' }}>✗</span>
+            {/* Health Information (from API) */}
+            {(pet.raw?.vaccination_status || pet.raw?.health_issues) && (
+              <div style={{ marginBottom: '30px' }}>
+                <h2 style={{ 
+                  fontSize: '1.5rem', 
+                  color: '#333', 
+                  margin: '0 0 15px 0',
+                  fontWeight: '600'
+                }}>
+                  Health Information
+                </h2>
+                <div style={{ color: '#555', fontSize: '16px', lineHeight: '1.6' }}>
+                  {pet.raw?.vaccination_status && (
+                    <p><strong>Vaccination:</strong> {pet.raw.vaccination_status}</p>
                   )}
-                  <span style={{ color: '#666', fontSize: '16px' }}>Vaccinated</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  {pet.healthInfo.microchipped ? (
-                    <span style={{ fontSize: '18px', color: '#4caf50' }}>✓</span>
-                  ) : (
-                    <span style={{ fontSize: '18px', color: '#ccc' }}>✗</span>
+                  {pet.raw?.health_issues && (
+                    <p><strong>Health issues:</strong> {pet.raw.health_issues}</p>
                   )}
-                  <span style={{ color: '#666', fontSize: '16px' }}>Microchipped</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  {pet.healthInfo.spayedNeutered ? (
-                    <span style={{ fontSize: '18px', color: '#4caf50' }}>✓</span>
-                  ) : (
-                    <span style={{ fontSize: '18px', color: '#ccc' }}>✗</span>
-                  )}
-                  <span style={{ color: '#666', fontSize: '16px' }}>Spayed/Neutered</span>
                 </div>
               </div>
-              <div>
-                <p style={{ 
-                  color: '#666', 
-                  fontSize: '16px', 
-                  margin: '10px 0 0 0',
-                  fontWeight: '500'
-                }}>
-                  Health Issues:
-                </p>
-                <p style={{ 
-                  color: '#555', 
-                  fontSize: '16px', 
-                  margin: '5px 0 0 0'
-                }}>
-                  {pet.healthInfo.healthIssues}
-                </p>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Right Sidebar */}
@@ -493,7 +368,7 @@ export default function PetProfilePage({ params }) {
                   color: '#333',
                   marginBottom: '5px'
                 }}>
-                  ${pet.adoptionFee}
+                  Rs{pet.adoptionFee ?? 'N/A'}
                 </div>
                 <div style={{ 
                   color: '#666', 
@@ -528,95 +403,53 @@ export default function PetProfilePage({ params }) {
                     ❤  Request to Adopt
                   </button>
                 </Link>
-                <Link href={`/adopter/pet/${pet.id}/contact`} style={{ width: '100%', textDecoration: 'none' }}>
-                  <button
-                    style={{
-                      width: '100%',
-                      backgroundColor: '#fff',
-                      color: '#333',
-                      padding: '14px 20px',
-                      borderRadius: '8px',
-                      border: '1px solid #e6e6e6',
-                      cursor: 'pointer',
-                      fontSize: '16px',
-                      fontWeight: '500',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px'
-                    }}
-                    type="button"
-                  >
-                    <span>💬</span>
-                    Contact Caregiver
-                  </button>
-                </Link>
+                {/* Contact route disabled - commented out per request */}
+                {false && (
+                  <Link href={`/adopter/pet/${pet.id}/contact`} style={{ width: '100%', textDecoration: 'none' }}>
+                    <button
+                      style={{
+                        width: '100%',
+                        backgroundColor: '#fff',
+                        color: '#333',
+                        padding: '14px 20px',
+                        borderRadius: '8px',
+                        border: '1px solid #e6e6e6',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                      }}
+                      type="button"
+                    >
+                      <span>💬</span>
+                      Contact Caregiver
+                    </button>
+                  </Link>
+                )}
               </div>
 
-              {/* Caregiver Section */}
+              {/* Caregiver / Owner Section (from API) */}
               <div style={{ 
                 marginBottom: '30px',
                 paddingBottom: '25px',
                 borderBottom: '1px solid #eee'
               }}>
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '8px',
-                  marginBottom: '15px'
-                }}>
-                  <h3 style={{ 
-                    fontSize: '1.2rem', 
-                    color: '#333', 
-                    margin: 0,
-                    fontWeight: '600'
-                  }}>
-                    Caregiver <span style={{ fontSize: '16px', color: '#35b7ff' }}>🛡️</span>
-                  </h3>
-                </div>
-                <Link href={`/caregiver/${pet.caregiver.id}`} style={{ textDecoration: 'none' }}>
-                  <div style={{ 
-                    fontSize: '1.1rem', 
-                    fontWeight: '600', 
-                    color: '#333',
-                    marginBottom: '8px',
-                    cursor: 'pointer'
-                  }}>
-                    {pet.caregiver.name}
+                <h3 style={{ fontSize: '1.2rem', color: '#333', margin: 0, fontWeight: '600' }}>
+                  Owner
+                </h3>
+                <div style={{ marginTop: 10 }}>
+                  <Link href={pet.raw?.owner ? `/caregiver/${pet.raw.owner}` : '#'} style={{ textDecoration: 'none' }}>
+                    <div style={{ fontSize: '1.1rem', fontWeight: '600', color: '#333', cursor: pet.raw?.owner ? 'pointer' : 'default' }}>
+                      {pet.owner || `User ${pet.raw?.owner || ''}`}
+                    </div>
+                  </Link>
+                  <div style={{ color: '#666', fontSize: '14px', marginTop: 8 }}>
+                    {pet.raw?.owner ? 'Verified owner' : ''}
                   </div>
-                </Link>
-                <div style={{ 
-                  color: '#666', 
-                  fontSize: '14px',
-                  marginBottom: '12px'
-                }}>
-                  ✓ Verified Caregiver
                 </div>
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '10px',
-                  marginBottom: '12px'
-                }}>
-                  {renderStars(pet.caregiver.rating)}
-                  <span style={{ 
-                    color: '#666', 
-                    fontSize: '14px' 
-                  }}>
-                    {pet.caregiver.rating} ({pet.caregiver.reviews} reviews)
-                  </span>
-                </div>
-                <div style={{ color: '#666', fontSize: '14px', marginBottom: '12px' }}>
-                  Member since 2022
-                </div>
-                <p style={{ 
-                  color: '#666', 
-                  fontSize: '14px', 
-                  lineHeight: '1.5',
-                  margin: 0
-                }}>
-                  {pet.caregiver.description}
-                </p>
               </div>
 
               {/* Quick Info */}
@@ -652,7 +485,7 @@ export default function PetProfilePage({ params }) {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: '#666', fontSize: '14px' }}>Adoption Type:</span>
-                    <span style={{ color: '#333', fontSize: '14px', fontWeight: '500' }}>{pet.adoptionType}</span>
+                    <span style={{ color: '#333', fontSize: '14px', fontWeight: '500' }}>{pet.raw?.adoption_type || '—'}</span>
                   </div>
                 </div>
               </div>

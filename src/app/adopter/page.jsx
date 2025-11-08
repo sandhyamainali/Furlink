@@ -1,151 +1,70 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 
 
 function AdoptPage() {
-  const pets = [
-  {
-    id: 1,
-    name: 'Max',
-    type: 'Dog',
-    breed: 'Golden Retriever',
-    age: '3 years',
-    location: 'Baneshwor, Kathmandu',
-    status: 'Available',
-  
-    description: 'Friendly and energetic golden retriever looking for an active family. Loves kids and other pets.',
-    caregiverId: 1,
-    image: '/img/dog1.jpeg'
-  },
-  {
-    id: 2,
-    name: 'Luna',
-    type: 'Cat',
-    breed: 'Persian',
-    age: '2 years',
-    location: 'Balkhu, Patan',
-    status: 'Available',
-   
-    description: 'Gentle and affectionate Persian cat, prefers quiet and calm environments. Perfect for...',
-    caregiverId: 1,
-    image: '/img/cat1.jpg'
-  },
-  {
-    id: 3,
-    name: 'Snowball',
-    type: 'Rabbit',
-    breed: 'Holland Lop',
-    age: '1 year',
-    location: 'Jorpati, Kathmandu',
-    status: 'Available',
+  const router = useRouter();
+  const [pets, setPets] = useState([]);
+  const [activeTab, setActiveTab] = useState('adopt');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    description: 'Snowball is a sweet rabbit who loves fresh vegetables and gentle handling. Great pet for families...',
-    caregiverId: 2,
-    image: '/img/rabbit.jpg'
-  },
-  {
-    id: 4,
-    name: 'Buddy',
-    type: 'Dog',
-    breed: 'Australian Shepherd',
-    age: '2 years',
-    location: 'Gaushala, Kathmandu',
-    status: 'Available',
-    
-    description: 'Intelligent and active dog who loves outdoor activities and mental stimulation.',
-    caregiverId: 3,
-    image: '/img/dog3.jpg'
-  },
-  {
-    id: 5,
-    name: 'Whiskers',
-    type: 'Cat',
-    breed: 'Tabby',
-    age: '4 years',
-    location: 'Radhe Radhe, Bhaktapur',
-    status: 'Adopted',
-   
-    description: 'Lovable tabby cat with playful personality.',
-    caregiverId: 3,
-    image: '/img/cat2.jpg'
+  useEffect(() => {
+    // Require bearer token stored in localStorage under 'access'
+    const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
+    if (!token) {
+      router.replace('/login');
+      return;
+    }
+
+    const API_BASE = 'https://furlink-backend.vercel.app';
+    fetch(`${API_BASE}/pet/pets/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json'
+      }
+    })
+      .then((res) => {
+        if (res.status === 401 || res.status === 403) {
+          router.replace('/login');
+          throw new Error('Unauthorized');
+        }
+        if (!res.ok) throw new Error(`API error ${res.status}`);
+        return res.json();
+      })
+      .then((data) => setPets(Array.isArray(data) ? data : []))
+      .catch((err) => {
+        if (err.message !== 'Unauthorized') setError(err.message || 'Failed to load pets');
+      })
+      .finally(() => setLoading(false));
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div style={{ padding: 40, textAlign: 'center' }}>
+        <h2 style={{ fontSize: 20, marginBottom: 8 }}>Loading pets…</h2>
+      </div>
+    );
   }
-];
 
-  const [activeTab, setActiveTab] = React.useState('adopt');
+  if (error) {
+    return (
+      <div style={{ padding: 40, textAlign: 'center' }}>
+        <h2 style={{ fontSize: 20, marginBottom: 8 }}>Unable to load pets</h2>
+        <p style={{ color: '#666' }}>{error}</p>
+        <Link href="/login" style={{ color: '#a0632b', marginTop: 12, display: 'inline-block' }}>Login</Link>
+      </div>
+    );
+  }
 
   return (
     <div>
-      {/* <nav className="nav">
-        <div className="nav-container ">
-       
-          <div className="logo">
-            <Image src="/img/logo.png" alt="Furlink Logo" width={90} height={90} />
-          </div>
 
-         
-          <ul className="nav-menu ">
-            <li>
-              <Link href="/" className="nav-link active ">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link href="/about" className="nav-link active">
-                About
-              </Link>
-            </li>
-            <li>
-              <Link href="/service" className="nav-link active">
-                Service
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="nav-link">
-                Contact
-              </Link>
-            </li>
-            <li>
-              <Link href="/gallery" className="nav-link">
-                Gallery
-              </Link>
-            </li>
-            <li>
-              <Link href="/shop" className="nav-link">
-                Shop <span> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart-icon lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></span>
-              </Link>
-            </li>
-            <li>
-              <Link href="/adopter" className="nav-link">
-                Adoption
-              </Link>
-            </li>
-          </ul>
-
-        
-          <div>
-            <Link href="/login">
-              <button className="login-button">
-                Log In
-              </button>
-            </Link>
-          </div>
-
-          
-          <button
-            className="mobile-menu-button"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
-      </nav> */}
-      
       <section
         style={{
           backgroundColor: '#fef9f4',
@@ -267,9 +186,7 @@ function AdoptPage() {
               }}
             >
               <div style={{ position: 'relative', width: '100%', height: '250px' }}>
-                <Image 
-                  src={pet.image} 
-                  alt={pet.name} 
+                <Image src={pet.image} alt={pet.name} 
                   fill
                   style={{ objectFit: 'cover' }}
                 />
@@ -277,16 +194,16 @@ function AdoptPage() {
                   position: 'absolute', 
                   top: '10px', 
                   left: '10px',
-                  backgroundColor: pet.status === 'Available' ? '#a0d8ef' : '#ffb380',
+                  backgroundColor: pet.is_available_for_adoption ? '#4CAF50' : '#ff6b6b',
                   color: 'white',
                   padding: '5px 12px',
                   borderRadius: '15px',
                   fontSize: '0.85rem',
                   fontWeight: '500'
                 }}>
-                  {pet.status}
+                  {pet.is_available_for_adoption ? 'Available' : 'Unavailable'}
                 </div>
-                {pet.adoptionType === 'Temporary' && (
+                {false && (
                   <div style={{ 
                     position: 'absolute', 
                     top: '10px', 
@@ -316,24 +233,44 @@ function AdoptPage() {
                 <p style={{ margin: '10px 0 15px 0', color: '#555', fontSize: '0.9rem', lineHeight: '1.5' }}>
                   {pet.description}
                 </p>
-                <Link href={`/adopter/pet/${pet.id}`}>
+                {pet.is_available_for_adoption ? (
+                  <Link href={`/adopter/pet/${pet.id}`}>
+                    <button
+                      style={{
+                        width: '100%',
+                        backgroundColor: '#996633',
+                        color: 'white',
+                        padding: '12px 20px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '1rem',
+                        fontWeight: '500',
+                      }}
+                      type="button"
+                    >
+                      View Pet Profile
+                    </button>
+                  </Link>
+                ) : (
                   <button
                     style={{
                       width: '100%',
-                      backgroundColor: '#996633',
-                      color: 'white',
+                      backgroundColor: '#cccccc',
+                      color: '#666666',
                       padding: '12px 20px',
                       borderRadius: '8px',
                       border: 'none',
-                      cursor: 'pointer',
+                      cursor: 'not-allowed',
                       fontSize: '1rem',
                       fontWeight: '500',
                     }}
+                    disabled
                     type="button"
                   >
-                    View Pet Profile
+                    Not Available
                   </button>
-                </Link>
+                )}
               </div>
             </div>
           ))}

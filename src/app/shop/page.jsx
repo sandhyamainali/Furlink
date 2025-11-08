@@ -160,11 +160,11 @@ export default function ShopPage() {
                 <div>
                   {p.discount_price && p.discount_price !== p.price ? (
                     <div>
-                      <span style={{ textDecoration: 'line-through', color: '#999', marginRight: 8 }}>${p.price}</span>
-                      <span style={{ fontWeight: 'bold', color: '#cc4400' }}>${p.discount_price}</span>
+                      <span style={{ textDecoration: 'line-through', color: '#999', marginRight: 8 }}>Rs{p.price}</span>
+                      <span style={{ fontWeight: 'bold', color: '#cc4400' }}>Rs{p.discount_price}</span>
                     </div>
                   ) : (
-                    <span style={{ fontWeight: 'bold' }}>${p.price}</span>
+                    <span style={{ fontWeight: 'bold' }}>Rs{p.price}</span>
                   )}
                 </div>
 

@@ -258,7 +258,7 @@ export default function ContactPage() {
           <p>
             Phone: <a href="tel:+977-1234567890">+977-1234567890</a>
           </p>
-          <p>Address: 123 Urban Pet Care St, Kathmandu, Nepal</p>
+          <p>Address: Baneshwor Kathmandu, Nepal</p>
         </section>
       </main>
 

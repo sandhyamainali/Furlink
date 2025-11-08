@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactUse from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+
 import { useRouter } from 'next/navigation';
 
 
@@ -11,212 +11,123 @@ import { useRouter } from 'next/navigation';
 // ✅ Adopt Request Form Component
 export default function AdoptRequestForm({ params }) {
   const router = useRouter();
-  const { id } = ReactUse.use(params); // ✅ Unwrap params safely in Next.js 15+
+  const { id } = ReactUse.use(params); // pet id from route params
 
-  const [form, setForm] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zip: '',
-    homeType: '',
-    hasYard: '',
-    children: '',
-    otherPets: '',
-    experience: '',
-    preferredDate: '',
-    message: '',
-    agree: false,
-  });
+  const [isSubmitting, setIsSubmitting] = useState(true);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const [responseData, setResponseData] = useState(null);
 
-  const onChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-  };
+  useEffect(() => {
+    const submitAdoption = async () => {
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
+        if (!token) {
+          router.replace('/login');
+          return;
+        }
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-    if (!form.agree) {
-      alert('Please agree to the terms to proceed.');
-      return;
-    }
-    // Redirect after form submission
-    router.push(`/adopter/pet/${id}`);
-  };
+        const res = await fetch(`https://furlink-backend.vercel.app/pet/pets/${id}/adopt/`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify({ remarks: null })
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          router.replace('/login');
+          return;
+        }
+
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || `Adoption request failed (${res.status})`);
+        }
+
+        // success - store response and show popup; do not redirect immediately
+        const data = await res.json();
+        setResponseData(data);
+        setSuccess(true);
+        setIsSubmitting(false);
+      } catch (err) {
+        console.error('Adoption submit failed', err);
+        setError(err.message || 'Failed to submit adoption request');
+        setIsSubmitting(false);
+      }
+    };
+
+    submitAdoption();
+  }, [id, router]);
+
+  if (isSubmitting) {
+    return (
+      <div style={{ backgroundColor: '#fef9f4', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: '#666' }}>Submitting adoption request…</div>
+      </div>
+    );
+  }
+  if (success) {
+    return (
+      <div style={{ backgroundColor: 'rgba(0,0,0,0.4)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: 'white', padding: 24, borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.12)', maxWidth: 560, width: '90%' }}>
+          <h2 style={{ margin: 0, marginBottom: 8 }}>Adoption Request Submitted</h2>
+          <p style={{ color: '#333', marginTop: 6 }}>
+            This pet is adopted by <strong>{responseData?.adopter_username ?? 'the adopter'}</strong>.
+          </p>
+
+          <div style={{ background: '#f9f9f9', padding: 12, borderRadius: 8, marginTop: 12 }}>
+            <dl style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 16px', margin: 0 }}>
+              <div style={{ padding: '6px 8px' }}>
+                <dt style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Pet Name</dt>
+                <dd style={{ margin: 0, fontWeight: 600 }}>{responseData?.pet_name ?? '—'}</dd>
+              </div>
+
+              <div style={{ padding: '6px 8px' }}>
+                <dt style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Adopter</dt>
+                <dd style={{ margin: 0, fontWeight: 600 }}>{responseData?.adopter_username ?? '—'}</dd>
+              </div>
+
+              <div style={{ padding: '6px 8px' }}>
+                <dt style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Adoption Date</dt>
+                <dd style={{ margin: 0 }}>{responseData?.adoption_date ?? '—'}</dd>
+              </div>
+
+              <div style={{ padding: '6px 8px' }}>
+                <dt style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Remarks</dt>
+                <dd style={{ margin: 0 }}>{responseData?.remarks ?? '—'}</dd>
+              </div>
+
+              <div style={{ padding: '6px 8px' }}>
+                <dt style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Price Paid</dt>
+                <dd style={{ margin: 0 }}>{responseData?.price_paid ?? '0.00'}</dd>
+              </div>
+
+              <div style={{ padding: '6px 8px' }}>
+                <dt style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Confirmed</dt>
+                <dd style={{ margin: 0 }}>{responseData?.is_confirmed ? 'Yes' : 'No'}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div style={{ display: 'flex', gap: 8, marginTop: 16, justifyContent: 'flex-end' }}>
+            <button onClick={() => router.push('/adopter')} style={{ background: '#996633', color: '#fff', padding: '10px 14px', borderRadius: 8, border: 'none' }}>Continue</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ backgroundColor: '#fef9f4', minHeight: '100vh' }}>
-     
-
-      <div style={{ padding: '20px' }}>
-        <Link
-          href={`/adopter/pet/${id}`}
-          style={{
-            color: '#a0632b',
-            textDecoration: 'none',
-            fontSize: '16px',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            marginBottom: '20px',
-            padding: '10px 14px',
-            background: '#fff',
-            borderRadius: '12px',
-            border: '1px solid #f0e1cf',
-          }}
-        >
-          <span style={{ fontSize: '18px' }}>←</span>
-          Back to Pet Profile
-        </Link>
-
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <div
-            style={{
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              padding: '30px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            }}
-          >
-            <h1 style={{ fontSize: '1.8rem', color: '#1f2937', margin: 0, fontWeight: 700 }}>
-              Request to Adopt
-            </h1>
-            <p style={{ color: '#6b7280', marginTop: '8px' }}>
-              Fill out the form below. The caregiver will review your request and contact you.
-            </p>
-
-            <form onSubmit={onSubmit} style={{ marginTop: '20px' }}>
-              {/* Applicant Info */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '16px',
-                  marginBottom: '16px',
-                }}
-              >
-                <div>
-                  <label style={labelStyle}>Full Name *</label>
-                  <input name="fullName" value={form.fullName} onChange={onChange} required style={inputStyle} placeholder="Your name" />
-                </div>
-                <div>
-                  <label style={labelStyle}>Email *</label>
-                  <input type="email" name="email" value={form.email} onChange={onChange} required style={inputStyle} placeholder="you@example.com" />
-                </div>
-                <div>
-                  <label style={labelStyle}>Phone *</label>
-                  <input name="phone" value={form.phone} onChange={onChange} required style={inputStyle} placeholder="98xxxxxxxx" />
-                </div>
-                <div>
-                  <label style={labelStyle}>Preferred Meeting Date</label>
-                  <input type="date" name="preferredDate" value={form.preferredDate} onChange={onChange} style={inputStyle} />
-                </div>
-              </div>
-
-              {/* Address */}
-              <div style={{ marginBottom: '16px' }}>
-                <label style={labelStyle}>Address *</label>
-                <input name="address" value={form.address} onChange={onChange} required style={inputStyle} placeholder="Street address" />
-              </div>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr 1fr',
-                  gap: '16px',
-                  marginBottom: '16px',
-                }}
-              >
-                <input name="city" value={form.city} onChange={onChange} required style={inputStyle} placeholder="City" />
-                <input name="state" value={form.state} onChange={onChange} required style={inputStyle} placeholder="State" />
-                <input name="zip" value={form.zip} onChange={onChange} required style={inputStyle} placeholder="ZIP" />
-              </div>
-
-              {/* Household */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '16px',
-                  marginBottom: '16px',
-                }}
-              >
-                <div>
-                  <label style={labelStyle}>Home Type *</label>
-                  <select name="homeType" value={form.homeType} onChange={onChange} required style={inputStyle}>
-                    <option value="">Select</option>
-                    <option value="Apartment">Apartment</option>
-                    <option value="House">House</option>
-                    <option value="Townhouse">Townhouse</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={labelStyle}>Fenced Yard *</label>
-                  <select name="hasYard" value={form.hasYard} onChange={onChange} required style={inputStyle}>
-                    <option value="">Select</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={labelStyle}>Children at Home *</label>
-                  <select name="children" value={form.children} onChange={onChange} required style={inputStyle}>
-                    <option value="">Select</option>
-                    <option value="None">None</option>
-                    <option value="Under 5">Under 5</option>
-                    <option value="5-12">5-12</option>
-                    <option value="13+">13+</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={labelStyle}>Other Pets *</label>
-                  <select name="otherPets" value={form.otherPets} onChange={onChange} required style={inputStyle}>
-                    <option value="">Select</option>
-                    <option value="No">No</option>
-                    <option value="Dog(s)">Dog(s)</option>
-                    <option value="Cat(s)">Cat(s)</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Experience */}
-              <div style={{ marginBottom: '16px' }}>
-                <label style={labelStyle}>Experience with pets *</label>
-                <textarea name="experience" value={form.experience} onChange={onChange} required rows={4} style={textareaStyle} placeholder="Tell us about your past experience caring for pets." />
-              </div>
-
-              {/* Message */}
-              <div style={{ marginBottom: '16px' }}>
-                <label style={labelStyle}>Message to caregiver</label>
-                <textarea name="message" value={form.message} onChange={onChange} rows={4} style={textareaStyle} placeholder="Any additional info or questions" />
-              </div>
-
-              {/* Agreement */}
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '20px', color: '#374151', fontSize: '14px' }}>
-                <input type="checkbox" name="agree" checked={form.agree} onChange={onChange} style={{ marginTop: '3px' }} />
-                I confirm that the information provided is accurate and I understand the responsibilities of caring for a pet.
-              </label>
-
-              <button
-                type="submit"
-                style={{
-                  width: '100%',
-                  backgroundColor: '#ff8a3d',
-                  color: 'white',
-                  padding: '14px 16px',
-                  border: 'none',
-                  borderRadius: '10px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >
-                Submit Request
-              </button>
-            </form>
-          </div>
+    <div style={{ backgroundColor: '#fef9f4', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ background: 'white', padding: 24, borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+        <h2 style={{ margin: 0, marginBottom: 8 }}>Unable to submit adoption request</h2>
+        <p style={{ color: '#555' }}>{error}</p>
+        <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+          <button onClick={() => router.replace(`/adopter/pet/${id}`)} style={{ background: '#996633', color: '#fff', padding: '8px 12px', borderRadius: 8, border: 'none' }}>Back to Pet</button>
+          <button onClick={() => location.reload()} style={{ background: '#e5e7eb', color: '#111', padding: '8px 12px', borderRadius: 8, border: 'none' }}>Retry</button>
         </div>
       </div>
     </div>

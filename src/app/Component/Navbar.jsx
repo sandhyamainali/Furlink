@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useState } from "react";
+import { FaShoppingCart } from "react-icons/fa";
+import CartCount from "./CartCount";
 
 const ProfileControls = dynamic(() => import("./ProfileControls"), { ssr: false });
 
@@ -10,25 +12,33 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="nav">
-      <div className="nav-container ">
+    <nav className="nav bg-white shadow-sm">
+      <div className="nav-container px-4 py-2 max-w-7xl mx-auto">
         {/* Logo */}
         <div className="logo">
           <Image src="/img/logo.png" alt="Furlink Logo" width={90} height={90} />
         </div>
 
         {/* Navigation Menu */}
-        <ul className="nav-menu ">
-          <li><Link href="/" className="nav-link active ">Home</Link></li>
-          <li><Link href="/about" className="nav-link active">About</Link></li>
-          <li><Link href="/service" className="nav-link active">Service</Link></li>
-          <li><Link href="/contact" className="nav-link">Contact</Link></li>
-          <li><Link href="/gallery" className="nav-link">Gallery</Link></li>
-          <li><Link href="/shop" className="nav-link">Shop</Link></li>
-          <li><Link href="/adopter" className="nav-link">Adoption</Link></li>
+        <ul className="nav-menu text-sm ">
+          <li><Link href="/" className="nav-link active px-3 py-2">Home</Link></li>
+          <li><Link href="/about" className="nav-link active px-3 py-2">About</Link></li>
+          <li><Link href="/service" className="nav-link active px-3 py-2">Service</Link></li>
+          <li><Link href="/contact" className="nav-link px-3 py-2">Contact</Link></li>
+          <li><Link href="/gallery" className="nav-link px-3 py-2">Gallery</Link></li>
+          <li>
+            <div className="flex items-center space-x-1">
+              <Link href="/shop" className="nav-link px-3 py-2">Shop</Link>
+              <Link href="/cart" className="relative inline-flex items-center justify-center p-1">
+                <FaShoppingCart size={16} className="text-gray-700" />
+                <CartCount />
+              </Link>
+            </div>
+          </li>
+          <li><Link href="/adopter" className="nav-link px-3 py-2">Adoption</Link></li>
         </ul>
 
-        {/* Profile & Cart Controls */}
+        {/* Profile Controls */}
         <ProfileControls/>
 
         {/* Mobile menu button */}

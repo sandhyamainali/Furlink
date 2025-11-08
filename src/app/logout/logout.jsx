@@ -3,15 +3,17 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { doLogout } from "../../lib/auth";
+import { logoutAndClearContext } from "../../lib/auth";
 
 export default function LogoutPage() {
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = () => {
+    console.log('logout.jsx: handleLogout called');
     setIsLoggingOut(true);
-    doLogout();
+    logoutAndClearContext();
+    console.log('logout.jsx: logoutAndClearContext completed');
     router.push("/");
   };
 

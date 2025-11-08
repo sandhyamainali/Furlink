@@ -3,10 +3,12 @@ import { useUser } from "@/context/userContext";
 import { useCart } from "@/context/cartContext";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const { user, isAuthenticated, setUser } = useUser();
   const { cartItems } = useCart();
+  const router = useRouter();
   const [listings, setListings] = useState([]);
   const [roleFilter, setRoleFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -78,14 +80,33 @@ export default function ProfilePage() {
     );
   }
 
-  const fullName = user.name || (user.email ? user.email.split("@")[0] : "");
+  // Prefer first_name/last_name from API, then name, then fallback to email local-part
+  const fullName = (user?.first_name || user?.firstName || user?.name)
+    ? `${user?.first_name || user?.firstName || user?.name}${user?.last_name ? ' ' + user.last_name : ''}`
+    : (user?.email ? user.email.split("@")[0] : "");
+
+  function handleLogout() {
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem('access');
+        localStorage.removeItem('refresh');
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('furlink_user');
+      }
+    } catch (e) {
+      // ignore
+    }
+    setUser(null);
+    // redirect to home
+    try { router.push('/'); } catch {}
+  }
 
   return (
     <div style={{ maxWidth: 1200, margin: "40px auto", padding: 20 }}>
       <h1 style={{ fontSize: "2rem", fontWeight: 800, marginBottom: 16 }}>Dashboard</h1>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
         <button
-          onClick={() => setUser(null)}
+          onClick={handleLogout}
           style={{
             backgroundColor: "#ef4444",
             color: "#fff",

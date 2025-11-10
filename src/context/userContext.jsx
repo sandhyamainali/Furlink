@@ -5,6 +5,7 @@ const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [balance, setBalance] = useState(0);
 
   useEffect(() => {
     try {
@@ -18,6 +19,19 @@ export function UserProvider({ children }) {
     } catch {
       console.log('userContext: Error parsing user from localStorage');
       // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      const storedBalance = typeof window !== "undefined" ? localStorage.getItem("furlink_balance") : null;
+      if (storedBalance) {
+        setBalance(parseFloat(storedBalance) || 0);
+      } else {
+        setBalance(0);
+      }
+    } catch {
+      setBalance(0);
     }
   }, []);
 
@@ -38,11 +52,22 @@ export function UserProvider({ children }) {
     }
   }, [user]);
 
+  useEffect(() => {
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("furlink_balance", balance.toString());
+      }
+    } catch {
+      // ignore
+    }
+  }, [balance]);
+
   // Listen for logout events
   useEffect(() => {
     const handleLogout = () => {
       console.log('userContext: Received logout event, clearing user');
       setUser(null);
+      setBalance(0);
     };
 
     if (typeof window !== 'undefined') {
@@ -51,7 +76,7 @@ export function UserProvider({ children }) {
     }
   }, []);
 
-  const value = useMemo(() => ({ user, setUser, isAuthenticated: !!user }), [user]);
+  const value = useMemo(() => ({ user, setUser, balance, setBalance, isAuthenticated: !!user }), [user, balance]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }

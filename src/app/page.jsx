@@ -96,7 +96,7 @@ const PetFoodWebsite = () => {
 
                         <div className="button-container">
                             <button className="primary-button text-sm">Adopt a Pet</button>
-                            <button className="secondary-button">Want a Pet for Adoption</button>
+                            <button className="secondary-button">Rehome a Pet</button>
                         </div>
                     </div>
 

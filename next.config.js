@@ -16,6 +16,12 @@ const nextConfig = {
         port: '',
         pathname: '/images/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'furlink-backend.vercel.app',
+        port: '',
+        pathname: '/media/**',
+      },
     ],
   },
   // Add any other Next.js configurations here

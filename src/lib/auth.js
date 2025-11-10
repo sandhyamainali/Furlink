@@ -1,5 +1,4 @@
 // Shared auth utilities
-// Shared auth utilities
 export function doLogout() {
   console.log('doLogout: Starting logout process');
   try {
@@ -22,19 +21,7 @@ export function logoutAndClearContext() {
   // Dispatch a custom event to notify components to clear user state
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('userLogout'));
-  }
-}
-export function doLogout() {
-  try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem('access');
-      localStorage.removeItem('refresh');
-      localStorage.removeItem('isAuthenticated');
-      localStorage.removeItem('furlink_user');
-    }
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error('Error clearing localStorage during logout:', err);
+    console.log('logoutAndClearContext: Dispatched userLogout event');
   }
 }
 

@@ -4,14 +4,20 @@ import Image from "next/image";
 import { useCart } from "@/context/cartContext";
 import { useUser } from "@/context/userContext";
 import { FaShoppingCart } from "react-icons/fa";
+import { logoutAndClearContext } from "../../lib/auth";
+import { useRouter } from "next/navigation";
 
 export default function ProfileControls() {
   const { user, isAuthenticated } = useUser();
+  const router = useRouter();
   console.log('ProfileControls: user:', user, 'isAuthenticated:', isAuthenticated);
   const profileSrc = user?.profile_picture || user?.avatar || user?.photo || user?.image || null;
 
-  const handleLogoutClick = () => {
-    console.log('ProfileControls: Logout button clicked');
+  const handleLogoutClick = (e) => {
+    e.preventDefault();
+    console.log('ProfileControls: Logout button clicked, performing logout');
+    logoutAndClearContext();
+    router.push("/");
   };
 
   return (
@@ -19,9 +25,7 @@ export default function ProfileControls() {
       {isAuthenticated ? (
         <div className=" profile  items-center ">
           <div className="flex items-center space-x-2">
-            <Link href="/logout">
-              <button className="login-button text-sm " onClick={handleLogoutClick}>Logout</button>
-            </Link>
+            <button className="login-button text-sm " onClick={handleLogoutClick}>Logout</button>
           </div>
           <div>
             <Link href="/profile" className="items-center ml-1">

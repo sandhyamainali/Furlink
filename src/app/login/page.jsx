@@ -102,7 +102,7 @@ export default function LoginPage() {
                 }
 
                 // Redirect after successful login
-                router.push('/profile');
+                router.push('/adopter');
             } else {
                 setError('Unexpected response from server');
             }

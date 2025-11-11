@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { API_BASE } from '@/lib/config';
 
 
 
@@ -22,8 +23,7 @@ function AdoptPage() {
       return;
     }
 
-    const API_BASE = 'https://furlink-backend.vercel.app';
-    fetch(`${API_BASE}/pet/pets/`, {
+  fetch(`${API_BASE}/pet/pets/`, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/json'

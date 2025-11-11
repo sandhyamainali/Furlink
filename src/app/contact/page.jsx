@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 
 import Link from 'next/link';
+import { API_BASE } from '@/lib/config';
 
 export default function ContactPage() {
   const [form, setForm] = useState({
@@ -48,7 +49,7 @@ export default function ContactPage() {
         message: form.message,
       };
 
-      const res = await fetch('https://furlink-backend.vercel.app/contact/', {
+  const res = await fetch(`${API_BASE}/contact/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

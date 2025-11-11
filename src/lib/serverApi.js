@@ -1,5 +1,5 @@
 // Server-side API helper — safe to import in Next.js server components
-const API_BASE = 'https://furlink-backend.vercel.app';
+import { API_BASE } from '@/lib/config';
 
 export async function getSinglePet(id) {
   if (!id) return { data: null, error: 'Missing id' };

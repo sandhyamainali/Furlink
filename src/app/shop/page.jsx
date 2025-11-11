@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/cartContext";
 
-const API_BASE = "https://furlink-backend.vercel.app";
+import { API_BASE } from '@/lib/config';
 
 export default function ShopPage() {
   const [categories, setCategories] = useState([]); // {id,name}

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { API_BASE } from '@/lib/config';
 
 export default function GalleryPage() {
   // Replace these URLs with your actual direct image URLs
@@ -61,7 +62,7 @@ export default function GalleryPage() {
 
   useEffect(() => {
     let mounted = true;
-    fetch('https://furlink-backend.vercel.app/gallery/')
+  fetch(`${API_BASE}/gallery/`)
       .then((res) => res.json())
       .then((data) => {
         if (!mounted) return;

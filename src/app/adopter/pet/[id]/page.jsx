@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { API_BASE } from '@/lib/config';
 
 // Client-side fetch for single pet detail (authenticated)
 
@@ -24,7 +25,6 @@ export default function PetProfilePage({ params }) {
         return;
       }
 
-      const API_BASE = 'https://furlink-backend.vercel.app';
       try {
         const res = await fetch(`${API_BASE}/pet/pets/${params.id}/`, {
           headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }

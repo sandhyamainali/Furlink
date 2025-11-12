@@ -1,6 +1,6 @@
 "use client";
 
-const API_BASE = "https://furlink-backend.vercel.app";
+import { API_BASE } from "@/lib/config";
 
 // Generic fetch helper with error handling
 async function fetchApi(endpoint, options = {}) {

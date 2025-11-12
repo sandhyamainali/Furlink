@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useUser } from '@/context/userContext';
 
 import { useRouter } from 'next/navigation';
+import { API_BASE } from '@/lib/config';
 
 
 
@@ -36,7 +37,7 @@ export default function AdoptRequestForm({ params }) {
           throw new Error(`Insufficient balance. You need at least Rs ${minBalanceRequired} to adopt a pet. Current balance: Rs ${balance.toFixed(2)}`);
         }
 
-        const res = await fetch(`https://furlink-backend.vercel.app/pet/pets/${id}/adopt/`, {
+  const res = await fetch(`${API_BASE}/pet/pets/${id}/adopt/`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,

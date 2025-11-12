@@ -4,7 +4,7 @@ import { useCart } from "@/context/cartContext";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { initiatePayment, simulateCallback, getTransaction, renderAndSubmitEsewaForm } from "../../lib/clientApi";
+import { API_BASE } from "@/lib/config";
 
 export default function ProfilePage() {
   const { user, isAuthenticated, setUser, balance, setBalance } = useUser();
@@ -28,13 +28,10 @@ export default function ProfilePage() {
     description: "",
   });
 
-  // Balance state
-  const [loadAmount, setLoadAmount] = useState("");
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("esewa");
+  // Account / balance state
   const [accountData, setAccountData] = useState(null);
   const [accountLoading, setAccountLoading] = useState(true);
-  const [loadBalanceStatus, setLoadBalanceStatus] = useState(null);
-  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
+  const [toast, setToast] = useState(null);
 
   
 
@@ -49,6 +46,40 @@ export default function ProfilePage() {
       setListings([]);
     }
   }, [user]);
+
+  // Listen for payment completion messages from popup windows and refresh account/balance
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handler = async (ev) => {
+      try {
+        if (!ev?.data || ev.data.type !== 'payment:completed') return;
+        // optional: verify origin
+        // if (ev.origin !== window.location.origin) return;
+        const tx = ev.data.tx_uuid;
+        // refresh account data
+        const token = localStorage.getItem('access');
+        if (!token) return;
+        try {
+          const res = await fetch(`${API_BASE}/auth/account/`, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } });
+          if (res.ok) {
+            const aData = await res.json();
+            if (aData && aData.length > 0) {
+              setAccountData(aData[0]);
+              setBalance(parseFloat(aData[0].balance) || 0);
+              // show a short success toast
+              try { showToast('Payment completed — balance updated', 'success'); } catch (e) { setToast({ msg: 'Payment completed', type: 'success' }); }
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, [setBalance]);
 
   // Load pets
   useEffect(() => {
@@ -77,8 +108,7 @@ export default function ProfilePage() {
           return;
         }
 
-        const API_BASE = 'https://furlink-backend.vercel.app';
-        const res = await fetch(`${API_BASE}/auth/account/`, {
+  const res = await fetch(`${API_BASE}/auth/account/`, {
           headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
         });
 
@@ -98,6 +128,42 @@ export default function ProfilePage() {
 
     fetchAccountData();
   }, [isAuthenticated, setBalance]);
+
+  // Exposed function to refresh account/balance (used by manual button and message handler)
+  async function refreshAccountData() {
+    setAccountLoading(true);
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
+      if (!token) {
+        setAccountLoading(false);
+        setToast({ msg: 'Not authenticated', type: 'error' });
+        return;
+      }
+      const res = await fetch(`${API_BASE}/auth/account/`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.length > 0) {
+          setAccountData(data[0]);
+          setBalance(parseFloat(data[0].balance) || 0);
+          setToast({ msg: 'Balance refreshed', type: 'success' });
+        }
+      } else {
+        setToast({ msg: 'Failed to refresh balance', type: 'error' });
+      }
+    } catch (e) {
+      setToast({ msg: 'Failed to refresh balance', type: 'error' });
+    } finally {
+      setAccountLoading(false);
+    }
+  }
+
+  // small toast helper
+  function showToast(msg, type = 'info', timeout = 3000) {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), timeout);
+  }
 
   // Derived stats
   const stats = useMemo(() => {
@@ -201,81 +267,176 @@ export default function ProfilePage() {
     }
   }
 
-  // Balance functions
-  async function handleLoadBalance(e) {
+  // Note: payment/load-balance functionality has been removed.
+  const [showLoadModal, setShowLoadModal] = useState(false);
+  const [topUpAmount, setTopUpAmount] = useState('');
+  const [topUpStatus, setTopUpStatus] = useState(null);
+
+  function openLoadModal() {
+    setTopUpAmount('');
+    setTopUpStatus(null);
+    setShowLoadModal(true);
+  }
+
+  function closeLoadModal() {
+    setShowLoadModal(false);
+  }
+
+  function submitTopUpRequest(e) {
     e.preventDefault();
-    const amount = parseFloat(loadAmount);
-    if (amount <= 0) return;
-
-    setIsLoadingBalance(true);
-    setLoadBalanceStatus(null);
-
-    try {
-      if (selectedPaymentMethod === "esewa") {
-        // Step 1: Initiate Payment
-        const successUrl = 'https://furlink-backend.vercel.app/payment/success/';
-        const failureUrl = 'https://furlink-backend.vercel.app/payment/failure/';
-        const { data: initData, error: initError } = await initiatePayment(amount, "EPAYTEST", successUrl, failureUrl);
-
-        if (initError) {
-          setLoadBalanceStatus(`Step 1 Failed: ${initError}`);
-          setIsLoadingBalance(false);
-          return;
-        }
-
-        const { tx_uuid, form_html } = initData;
-        setLoadBalanceStatus(`Step 1: Payment Initiated ✅ (tx_uuid: ${tx_uuid})`);
-
-        // Step 2: Render and submit eSewa form
-        if (form_html) {
-          setLoadBalanceStatus(`Step 2: Redirecting to eSewa...`);
-          renderAndSubmitEsewaForm(form_html);
-          // Wait a moment for form submission
-          await new Promise(resolve => setTimeout(resolve, 2000));
-        }
-
-        // Step 3: Simulate Callback (after user returns from eSewa)
-        const { data: callbackData, error: callbackError } = await simulateCallback(tx_uuid);
-
-        if (callbackError) {
-          setLoadBalanceStatus(`Step 2 Failed: ${callbackError}`);
-          setIsLoadingBalance(false);
-          return;
-        }
-
-        setLoadBalanceStatus(`Step 3: Callback Received ✅ (status: SUCCESS)`);
-
-        // Step 4: Get Transaction
-        const { data: transactionData, error: transactionError } = await getTransaction(tx_uuid);
-
-        if (transactionError) {
-          setLoadBalanceStatus(`Step 3 Failed: ${transactionError}`);
-          setIsLoadingBalance(false);
-          return;
-        }
-
-        setLoadBalanceStatus(`Step 4: Transaction Verified ✅ (status: ${transactionData.status})`);
-
-        // Step 5: Complete and update balance
-        if (transactionData.status === 'COMPLETED') {
-          setLoadBalanceStatus(`Step 5: Balance Loaded 🎉`);
-          setBalance(prev => prev + amount);
-          setLoadAmount("");
-        } else {
-          setLoadBalanceStatus(`Step 5: Payment not completed (status: ${transactionData.status})`);
-        }
-
-      } else if (selectedPaymentMethod === "khalti") {
-        // For Khalti, you can implement similar logic or keep as alert for now
-        alert(`Khalti integration not implemented yet. Amount: Rs ${amount}`);
-        setBalance(prev => prev + amount);
-        setLoadAmount("");
-      }
-    } catch (err) {
-      setLoadBalanceStatus(`Error: ${err.message}`);
-    } finally {
-      setIsLoadingBalance(false);
+    const amt = parseFloat(topUpAmount);
+    if (isNaN(amt) || amt <= 0) {
+      setTopUpStatus({ ok: false, msg: 'Enter a valid amount' });
+      return;
     }
+
+  // Open a new tab synchronously (no window features) to prefer a browser tab over a popup window
+  const popup = window.open('', '_blank');
+  try { if (popup) popup.opener = null; } catch (e) { /* ignore */ }
+    if (!popup) {
+      setTopUpStatus({ ok: false, msg: 'Popup blocked. Please allow popups and try again.' });
+      return;
+    }
+
+    // Give user immediate feedback in the popup while network request runs
+    try {
+      popup.document.open();
+      popup.document.write('<!doctype html><html><head><title>Starting payment</title></head><body><div style="font-family: sans-serif; padding:20px;">Starting payment... You will be redirected shortly.</div></body></html>');
+      popup.document.close();
+    } catch (e) {
+      // ignore write errors
+    }
+
+    (async () => {
+      setTopUpStatus({ ok: null, msg: 'Initiating payment...' });
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
+        const origin = typeof window !== 'undefined' ? window.location.origin : '';
+        const res = await fetch(`${API_BASE}/payment/initiate/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            amount: String(amt),
+            success_url: `${origin}/payment/callback/`,
+            failure_url: `${origin}/payment/callback/`,
+          }),
+        });
+
+        const text = await res.text().catch(() => null);
+        let data = null;
+        try {
+          data = text ? JSON.parse(text) : null;
+        } catch (e) {
+          data = null;
+        }
+
+        if (!res.ok) {
+          const msg = (data && data.error) ? data.error : `Initiate failed: ${res.status}`;
+          setTopUpStatus({ ok: false, msg });
+          try { popup.close(); } catch (e) {}
+          return;
+        }
+
+        const { tx_uuid, form_html, esewa_action, payment_url, redirect_url } = data || {};
+        setTopUpStatus({ ok: true, msg: `Payment initiated (tx: ${tx_uuid || 'unknown'})` });
+
+        // Start polling transaction status so the UI notices completion even if the provider
+        // does not POST to our /payment/callback/ endpoint (useful for debugging webhooks).
+        if (tx_uuid) {
+          setTopUpStatus({ ok: null, msg: `Waiting for transaction ${tx_uuid} to complete...` });
+          const pollTransaction = async (attempt = 0) => {
+            try {
+              const tRes = await fetch(`${API_BASE}/payment/transaction/${tx_uuid}/`, {
+                headers: {
+                  Accept: 'application/json',
+                  ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+              });
+              if (tRes.ok) {
+                const tData = await tRes.json();
+                // tData should include status or credited flag depending on backend
+                const status = tData && tData.status ? String(tData.status).toLowerCase() : '';
+                const creditedAmount = tData && (tData.credited_amount || tData.credited || 0);
+                const completed = (tData && (status === 'completed' || creditedAmount === true || Number(creditedAmount) > 0));
+                if (completed) {
+                  setTopUpStatus({ ok: true, msg: 'Payment completed and balance updated.' });
+                  // refresh account data/balance
+                  try {
+                    const aRes = await fetch(`${API_BASE}/auth/account/`, {
+                      headers: { Authorization: token ? `Bearer ${token}` : '', Accept: 'application/json' },
+                    });
+                    if (aRes.ok) {
+                      const aData = await aRes.json();
+                      if (aData && aData.length > 0) {
+                        setAccountData(aData[0]);
+                        setBalance(parseFloat(aData[0].balance) || 0);
+                      }
+                    }
+                  } catch (e) {
+                    // ignore account refresh errors
+                  }
+                  return;
+                }
+              }
+            } catch (e) {
+              // ignore transient errors
+            }
+
+            // retry up to ~2 minutes (40 attempts * 3s)
+            if (attempt < 40) {
+              setTimeout(() => pollTransaction(attempt + 1), 3000);
+            } else {
+              setTopUpStatus({ ok: null, msg: `Transaction ${tx_uuid} is pending; check the transaction endpoint for updates.` });
+            }
+          };
+
+          // start polling (do not await)
+          pollTransaction(0);
+        }
+
+        const action = esewa_action || payment_url || redirect_url || '';
+        if (!action) {
+          setTopUpStatus({ ok: false, msg: 'No payment action URL provided by the server.' });
+          try { popup.close(); } catch (e) {}
+          return;
+        }
+
+        // If backend provided a plain redirect URL, navigate the popup directly.
+        if (!form_html || String(form_html).trim() === '') {
+          try {
+            popup.location.href = action;
+          } catch (e) {
+            // as fallback, write a redirect page with a link
+            try {
+              popup.document.open();
+              popup.document.write(`<!doctype html><html><body><p>Redirecting to payment...</p><a href="${action}" target="_blank" rel="noopener">Continue</a><script>window.location='${action}';</script></body></html>`);
+              popup.document.close();
+            } catch (err) {}
+          }
+          return;
+        }
+
+        // Build and submit a form inside the popup; backend returned form inputs (form_html)
+        const html = `<!doctype html><html><head><title>Proceeding to payment</title></head><body><form id="esewa_form" action="${action}" method="post">${form_html || ''}<noscript><button type="submit">Continue</button></noscript></form><script>try{document.getElementById('esewa_form').submit();}catch(e){console.error(e);}</script></body></html>`;
+
+        try {
+          popup.document.open();
+          popup.document.write(html);
+          popup.document.close();
+        } catch (e) {
+          setTopUpStatus({ ok: false, msg: 'Failed to open payment page in popup.' });
+          try { popup.close(); } catch (err) {}
+        }
+
+        // Keep modal open so user sees status; they will complete payment in popup.
+      } catch (err) {
+        setTopUpStatus({ ok: false, msg: err?.message || String(err) });
+        try { popup.close(); } catch (e) {}
+      }
+    })();
   }
 
   if (!isAuthenticated) {
@@ -306,6 +467,12 @@ export default function ProfilePage() {
 
   return (
     <div style={{ maxWidth: 1200, margin: "40px auto", padding: 20 }}>
+      {/* Toast */}
+      {toast && (
+        <div style={{ position: 'fixed', right: 20, top: 20, zIndex: 80 }}>
+          <div style={{ padding: '10px 14px', borderRadius: 8, color: '#fff', background: toast.type === 'success' ? '#059669' : toast.type === 'error' ? '#dc2626' : '#2563eb', boxShadow: '0 6px 20px rgba(0,0,0,0.12)' }}>{toast.msg}</div>
+        </div>
+      )}
       <h1 style={{ fontSize: "2rem", fontWeight: 800, marginBottom: 16 }}>Dashboard</h1>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
         <button
@@ -369,61 +536,66 @@ export default function ProfilePage() {
               )}
             </div>
 
-            {/* Load Balance Form */}
-            <form onSubmit={handleLoadBalance} style={{ marginBottom: 16 }}>
-              <div style={{ marginBottom: 12 }}>
-                <input
-                  type="number"
-                  value={loadAmount}
-                  onChange={(e) => setLoadAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  min="1"
-                  step="0.01"
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "8px 12px",
-                    border: "1px solid #ddd",
-                    borderRadius: 4,
-                    marginBottom: 8
-                  }}
-                />
-                <select
-                  value={selectedPaymentMethod}
-                  onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "8px 12px",
-                    border: "1px solid #ddd",
-                    borderRadius: 4
-                  }}
-                >
-                  <option value="esewa">eSewa</option>
-                  <option value="khalti">Khalti</option>
-                </select>
-              </div>
+            {/* Load Balance feature removed - provide a safe manual request button */}
+            <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
               <button
-                type="submit"
-                disabled={isLoadingBalance}
+                onClick={openLoadModal}
                 style={{
-                  width: "100%",
-                  backgroundColor: isLoadingBalance ? "#9ca3af" : "#2563eb",
-                  color: "#fff",
-                  padding: "10px",
-                  border: "none",
-                  borderRadius: 4,
-                  cursor: isLoadingBalance ? "not-allowed" : "pointer",
-                  fontWeight: 600
+                  backgroundColor: '#2563eb',
+                  color: '#fff',
+                  padding: '8px 12px',
+                  border: 'none',
+                  borderRadius: 6,
+                  cursor: 'pointer',
+                  fontWeight: 600,
                 }}
               >
-                {isLoadingBalance ? 'Processing...' : 'Load Balance'}
+                Load Balance
               </button>
-              {loadBalanceStatus && (
-                <p style={{ marginTop: 10, color: loadBalanceStatus.includes('Failed') || loadBalanceStatus.includes('Error') ? 'red' : 'green', fontSize: '0.9rem' }}>
-                  {loadBalanceStatus}
-                </p>
-              )}
-            </form>
+
+              <button
+                onClick={refreshAccountData}
+                style={{
+                  backgroundColor: '#f3f4f6',
+                  color: '#111827',
+                  padding: '8px 12px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: 6,
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                }}
+              >
+                Refresh balance
+              </button>
+            </div>
+
+            {showLoadModal && (
+              <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }}>
+                <div style={{ background: '#fff', padding: 20, borderRadius: 8, width: 360, boxShadow: '0 6px 24px rgba(0,0,0,0.2)' }}>
+                  <h3 style={{ marginTop: 0, marginBottom: 8 }}>Request Top-up</h3>
+                  <form onSubmit={submitTopUpRequest}>
+                    <div style={{ marginBottom: 8 }}>
+                      <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600 }}>Amount</label>
+                      <input
+                        value={topUpAmount}
+                        onChange={(e) => setTopUpAmount(e.target.value)}
+                        placeholder="e.g. 100.00"
+                        style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #ddd' }}
+                      />
+                    </div>
+
+                    {topUpStatus && (
+                      <div style={{ marginBottom: 8, color: topUpStatus.ok ? 'green' : 'red' }}>{topUpStatus.msg}</div>
+                    )}
+
+                    <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                      <button type="button" onClick={closeLoadModal} style={{ background: '#6b7280', color: '#fff', padding: 8, border: 'none', borderRadius: 6, cursor: 'pointer' }}>Cancel</button>
+                      <button type="submit" style={{ background: '#10b981', color: '#fff', padding: 8, border: 'none', borderRadius: 6, cursor: 'pointer' }}>Request Top-up</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>

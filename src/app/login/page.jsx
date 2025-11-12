@@ -6,6 +6,7 @@ import { FaFacebookF } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { API_BASE } from '@/lib/config';
 
 export default function LoginPage() {
         const [email, setEmail] = useState("");
@@ -29,20 +30,21 @@ export default function LoginPage() {
                 return;
             }
 
-            const API_BASE = "https://furlink-backend.vercel.app";
-
             const res = await fetch(`${API_BASE}/auth/login/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
 
-            const data = await res.json().catch(() => ({}));
+            // Read raw response text first so we can log/inspect non-JSON responses
+            const raw = await res.text().catch(() => null);
+            let data = null;
+            try { data = raw ? JSON.parse(raw) : null; } catch (e) { data = null; }
 
             if (!res.ok) {
-                // Handle validation/errors from backend
-                // Example: { non_field_errors: ["Invalid email or password"] }
-                const msg = (data && (data.non_field_errors?.[0] || data.detail || data.error)) || 'Login failed';
+                // Handle validation/errors from backend. Prefer useful backend message.
+                const msg = (data && (data.non_field_errors?.[0] || data.detail || data.error)) || raw || `Login failed (${res.status})`;
+                console.error('Login failed', { status: res.status, body: raw, json: data });
                 setError(msg);
                 return;
             }

@@ -4,6 +4,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaFacebookF } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
+import { API_BASE } from '@/lib/config';
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -55,8 +56,7 @@ export default function LoginPage() {
         throw new Error("Please enter a valid contact number.");
       }
 
-      // Prepare registration payload expected by backend
-      const API_BASE = "https://furlink-backend.vercel.app";
+  // Prepare registration payload expected by backend
 
       const username = email ? email.split("@")[0] : fullName.replace(/\s+/g, "").toLowerCase();
       const names = fullName.trim().split(/\s+/);

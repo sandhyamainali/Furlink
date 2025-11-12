@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useCart } from "../../context/cartContext";
-import { initiatePayment, simulateCallback, getTransaction, renderAndSubmitEsewaForm } from "../../lib/clientApi";
+// Payment functionality removed — checkout disabled.
 
 
 export default function CartPage() {
@@ -17,68 +17,8 @@ export default function CartPage() {
   const grandTotal = getTotal();
 
   const handleCheckout = async () => {
-    if (cartItems.length === 0) return;
-    setIsProcessing(true);
-    setPaymentStatus(null);
-
-    try {
-      // Step 1: Initiate Payment
-      const successUrl = 'https://furlink-backend.vercel.app/payment/success/';
-      const failureUrl = 'https://furlink-backend.vercel.app/payment/failure/';
-      const { data: initData, error: initError } = await initiatePayment(grandTotal, "EPAYTEST", successUrl, failureUrl);
-
-      if (initError) {
-        setPaymentStatus(`Step 1 Failed: ${initError}`);
-        setIsProcessing(false);
-        return;
-      }
-
-      const { tx_uuid, form_html } = initData;
-      setPaymentStatus(`Step 1: Payment Initiated ✅ (tx_uuid: ${tx_uuid})`);
-
-      // Step 2: Render and submit eSewa form
-      if (form_html) {
-        setPaymentStatus(`Step 2: Redirecting to eSewa...`);
-        renderAndSubmitEsewaForm(form_html);
-        // Wait a moment for form submission
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-
-      // Step 3: Simulate Callback (after user returns from eSewa)
-      const { data: callbackData, error: callbackError } = await simulateCallback(tx_uuid);
-
-      if (callbackError) {
-        setPaymentStatus(`Step 2 Failed: ${callbackError}`);
-        setIsProcessing(false);
-        return;
-      }
-
-      setPaymentStatus(`Step 3: Callback Received ✅ (status: SUCCESS)`);
-
-      // Step 4: Get Transaction
-      const { data: transactionData, error: transactionError } = await getTransaction(tx_uuid);
-
-      if (transactionError) {
-        setPaymentStatus(`Step 3 Failed: ${transactionError}`);
-        setIsProcessing(false);
-        return;
-      }
-
-      setPaymentStatus(`Step 4: Transaction Verified ✅ (status: ${transactionData.status})`);
-
-      // Step 5: Complete
-      if (transactionData.status === 'COMPLETED') {
-        setPaymentStatus(`Step 5: Payment Completed 🎉`);
-        clearCart(); // Clear cart on successful payment
-      } else {
-        setPaymentStatus(`Step 5: Payment not completed (status: ${transactionData.status})`);
-      }
-
-    } catch (err) {
-      setPaymentStatus(`Error: ${err.message}`);
-    } finally {
-      setIsProcessing(false);
-    }
+    // Checkout/payment removed. Keep cart operations local.
+    setPaymentStatus('Checkout disabled: payment integration removed.');
   };
 
   return (
@@ -131,10 +71,10 @@ export default function CartPage() {
           <button
             className="btn btn-primary"
             onClick={handleCheckout}
-            disabled={isProcessing}
+            disabled={true}
             style={{ marginTop: 20 }}
           >
-            {isProcessing ? 'Processing...' : 'Checkout with eSewa'}
+            Checkout (disabled)
           </button>
           {paymentStatus && (
             <p style={{ marginTop: 10, color: paymentStatus.includes('Failed') || paymentStatus.includes('Error') ? 'red' : 'green' }}>

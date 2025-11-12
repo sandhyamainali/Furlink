@@ -31,11 +31,11 @@ export default function AdoptRequestForm({ params }) {
         }
 
         // First, check if user has sufficient balance (assuming adoption fee is needed)
-        // For now, we'll assume a minimum balance requirement of Rs 100 for adoption
-        const minBalanceRequired = 80;
-        if (balance < minBalanceRequired) {
-          throw new Error(`Insufficient balance. You need at least Rs ${minBalanceRequired} to adopt a pet. Current balance: Rs ${balance.toFixed(2)}`);
-        }
+        // // For now, we'll assume a minimum balance requirement of Rs 100 for adoption
+        // const minBalanceRequired = 80;
+        // if (balance < minBalanceRequired) {
+        //   throw new Error(`Insufficient balance. You need at least Rs ${minBalanceRequired} to adopt a pet. Current balance: Rs ${balance.toFixed(2)}`);
+        // }
 
   const res = await fetch(`${API_BASE}/pet/pets/${id}/adopt/`, {
           method: 'POST',
@@ -61,10 +61,10 @@ export default function AdoptRequestForm({ params }) {
         const data = await res.json();
 
         // Deduct balance on successful adoption (simulate payment)
-        const adoptionFee = data.price_paid || 0;
-        if (adoptionFee > 0) {
-          setBalance(prev => Math.max(0, prev - adoptionFee));
-        }
+        // const adoptionFee = data.price_paid || 0;
+        // if (adoptionFee > 0) {
+        //   setBalance(prev => Math.max(0, prev - adoptionFee));
+        // }
 
         setResponseData(data);
         setSuccess(true);

@@ -23,7 +23,25 @@ function AdoptPage() {
       return;
     }
 
-  fetch(`${API_BASE}/pet/pets/`, {
+    // Get pets from localStorage (added by users in profile)
+    const localPetsRaw = typeof window !== 'undefined' ? localStorage.getItem('furlink_pets') : null;
+    const localPets = localPetsRaw ? JSON.parse(localPetsRaw) : [];
+    
+    // Transform local pets to match API format
+    const transformedLocalPets = localPets.map(pet => ({
+      id: pet.id,
+      name: pet.name,
+      breed: pet.breed,
+      type: pet.type,
+      age: pet.age,
+      description: pet.description,
+      image: pet.img || '/img/pet.png', // Use pet image or default
+      location: 'Local', // Default location
+      is_available_for_adoption: true
+    }));
+
+    
+    fetch(`${API_BASE}/pet/pets/`, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/json'
@@ -37,9 +55,18 @@ function AdoptPage() {
         if (!res.ok) throw new Error(`API error ${res.status}`);
         return res.json();
       })
-      .then((data) => setPets(Array.isArray(data) ? data : []))
+      .then((data) => {
+        const apiPets = Array.isArray(data) ? data : [];
+        // Combine API pets with local pets
+        const allPets = [...transformedLocalPets, ...apiPets];
+        setPets(allPets);
+      })
       .catch((err) => {
-        if (err.message !== 'Unauthorized') setError(err.message || 'Failed to load pets');
+        if (err.message !== 'Unauthorized') {
+          setError(err.message || 'Failed to load pets');
+          // If API fails, still show local pets
+          setPets(transformedLocalPets);
+        }
       })
       .finally(() => setLoading(false));
   }, [router]);
@@ -280,5 +307,6 @@ function AdoptPage() {
     </div>
   );
 }
+// change this page and profile to see added pet in profile to adopter if previous code needed it is in github
 
 export default AdoptPage;

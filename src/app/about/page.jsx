@@ -27,7 +27,7 @@ function AboutPage() {
             </p>
             <div style={{ marginTop: 16 }}>
               <a href="/adopter" className="primary-button" style={{ padding: '10px 16px', borderRadius: 8 }}>Browse Pets</a>
-              <a href="/adopter/submit" style={{ marginLeft: 12, padding: '10px 16px', borderRadius: 8, background: '#fff', color: '#996633', textDecoration: 'none' }}>List a Pet</a>
+              <a href="/profile" style={{ marginLeft: 12, padding: '10px 16px', borderRadius: 8, background: '#fff', color: '#996633', textDecoration: 'none' }}>List a Pet</a>
             </div>
           </div>
         </div>
@@ -93,7 +93,7 @@ function AboutPage() {
         <p style={{ marginTop: 8, color: '#444' }}>Browse adoptable pets or list a pet in need of a home.</p>
         <div style={{ marginTop: 12 }}>
           <a href="/adopter" className="primary-button" style={{ padding: '10px 18px', borderRadius: 8 }}>Browse Pets</a>
-          <a href="/adopter/submit" style={{ marginLeft: 10, padding: '10px 16px', borderRadius: 8, background: '#fff', color: '#996633', textDecoration: 'none' }}>List a Pet</a>
+          <a href="/profile" style={{ marginLeft: 10, padding: '10px 16px', borderRadius: 8, background: '#fff', color: '#996633', textDecoration: 'none' }}>List a Pet</a>
         </div>
       </section>
 

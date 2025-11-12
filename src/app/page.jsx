@@ -95,8 +95,12 @@ const PetFoodWebsite = () => {
                         </p>
 
                         <div className="button-container">
-                            <button className="primary-button text-sm">Adopt a Pet</button>
-                            <button className="secondary-button">Rehome a Pet</button>
+                            <Link href="/profile">
+                                <button className="primary-button text-sm">Adopt a Pet</button>
+                            </Link>
+                            <Link href="/adopter">
+                                <button className="secondary-button">Rehome a Pet</button>
+                            </Link>
                         </div>
                     </div>
 

@@ -36,7 +36,7 @@ const Footer = () => {
           <ul className="footer-links">
             <li><a href="/">Home</a></li>
             <li><a href="/about">About Us</a></li>
-            <li><a href="/adoption">Pet Adoption</a></li>
+            <li><a href="/adopter">Pet Adoption</a></li>
             <li><a href="/terms">Terms and Condition</a></li>
             <li><a href="/">How It Works</a></li>
           </ul>
@@ -46,8 +46,8 @@ const Footer = () => {
         <div>
           <h4 className="footer-heading">Services</h4>
           <ul className="footer-links">
-            <li><a href="/adopter/adopt">Pet Adoption</a></li>
-            <li><a href="/adopter">Pet Fostering</a></li>
+            <li><a href="/adopter">Pet Adoption</a></li>
+            <li><a href="/profile">Pet Fostering</a></li>
             <li><a href="/adopter">Pet Care Support</a></li>
             <li><a href="#">Community Platform</a></li>
           </ul>

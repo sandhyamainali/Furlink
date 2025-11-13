@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import { useCart } from "../../context/cartContext";
-// Payment functionality removed — checkout disabled.
 
 
 export default function CartPage() {
@@ -22,7 +21,8 @@ export default function CartPage() {
   };
 
   return (
-    <div className="cart-container" style={{ fontFamily: "Arial, sans-serif" }}>
+    // style={{ fontFamily: "Arial, sans-serif" }}
+    <div className="cart-container" >
       
       
       <h1>Your Cart</h1>
@@ -43,13 +43,13 @@ export default function CartPage() {
                 <h3 className="cart-item-title">{item.name}</h3>
                 <p className="cart-item-desc">{item.description}</p>
                 <div className="cart-item-meta">
-                  <div>Unit: <strong>${unit.toFixed(2)}</strong></div>
+                  <div>Unit: <strong>Rs{unit.toFixed(2)}</strong></div>
                 </div>
               </div>
 
               <div style={{ textAlign: 'right' }}>
                 <p style={{ margin: 0 }}>Qty: <strong>{item.quantity}</strong></p>
-                <p style={{ margin: '6px 0' }}>Subtotal: <strong>${lineTotal.toFixed(2)}</strong></p>
+                <p style={{ margin: '6px 0' }}>Subtotal: <strong>Rs{lineTotal.toFixed(2)}</strong></p>
                 <div className="cart-qty-controls" style={{ justifyContent: 'flex-end' }}>
                   <button className="btn btn-secondary" onClick={() => decreaseQuantity(item.id)} aria-label={`Decrease ${item.name}`}>-</button>
                   <button className="btn btn-primary" onClick={() => addToCart(item, 1)} aria-label={`Increase ${item.name}`}>+</button>

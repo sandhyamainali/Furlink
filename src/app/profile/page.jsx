@@ -35,8 +35,15 @@ export default function ProfilePage() {
     adoption_days: 1,
     currency: "USD"
   });
+  const [petImage, setPetImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [petsLoading, setPetsLoading] = useState(false);
   const [petsError, setPetsError] = useState(null);
+
+  // 🏠 My Adoptions state
+  const [adoptions, setAdoptions] = useState([]);
+  const [adoptionsLoading, setAdoptionsLoading] = useState(false);
+  const [adoptionsError, setAdoptionsError] = useState(null);
 
   // Account / balance state
   const [accountData, setAccountData] = useState(null);
@@ -55,7 +62,7 @@ export default function ProfilePage() {
     }
   }, [user]);
 
-  // Listen for payment completion messages from popup windows and refresh account/balance
+  // Listen for payment completion messages
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const handler = async (ev) => {
@@ -119,10 +126,45 @@ export default function ProfilePage() {
     }
   };
 
-  // Load pets on component mount and when user changes
+  // Load adoptions from API
+  const fetchAdoptions = async () => {
+    if (!isAuthenticated) return;
+    
+    setAdoptionsLoading(true);
+    setAdoptionsError(null);
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await fetch(`${API_BASE}/pet/adoptions/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch adoptions: ${response.status}`);
+      }
+
+      const adoptionsData = await response.json();
+      setAdoptions(adoptionsData);
+    } catch (err) {
+      console.error('Error fetching adoptions:', err);
+      setAdoptionsError(err.message);
+      showToast('Failed to load adoptions', 'error');
+    } finally {
+      setAdoptionsLoading(false);
+    }
+  };
+
+  // Load pets and adoptions on component mount
   useEffect(() => {
     if (isAuthenticated) {
       fetchPets();
+      fetchAdoptions();
     }
   }, [isAuthenticated]);
 
@@ -233,13 +275,36 @@ export default function ProfilePage() {
     } catch {}
   }
 
-  // 🐾 Pet CRUD functions - Updated for API
+  // 🐾 Pet CRUD functions
   function handlePetInputChange(e) {
     const { name, value, type, checked } = e.target;
     setPetForm((prev) => ({ 
       ...prev, 
       [name]: type === 'checkbox' ? checked : value 
     }));
+  }
+
+  // Handle image upload
+  function handleImageChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+      setPetImage(file);
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // Remove image
+  function handleRemoveImage() {
+    setPetImage(null);
+    setImagePreview(null);
+    // Clear file input
+    const fileInput = document.getElementById('pet-image');
+    if (fileInput) fileInput.value = '';
   }
 
   async function handleAddOrUpdatePet(e) {
@@ -252,39 +317,51 @@ export default function ProfilePage() {
         return;
       }
 
-      const petData = {
-        ...petForm,
-        age: parseInt(petForm.age) || 0,
-        weight: parseFloat(petForm.weight) || 0,
-        adoption_price: petForm.adoption_price || "0.00",
-        adoption_days: parseInt(petForm.adoption_days) || 1,
-      };
+      // Create FormData for file upload
+      const formData = new FormData();
+      
+      // Append all form fields
+      Object.keys(petForm).forEach(key => {
+        if (key === 'adoption_price' && !petForm[key]) {
+          formData.append(key, "0.00");
+        } else if (key === 'age' || key === 'weight' || key === 'adoption_days') {
+          formData.append(key, petForm[key] || "0");
+        } else if (key === 'is_available_for_adoption') {
+          formData.append(key, petForm[key] ? "true" : "false");
+        } else {
+          formData.append(key, petForm[key] || "");
+        }
+      });
+
+      // Append image if exists
+      if (petImage) {
+        formData.append('image', petImage);
+      }
 
       let response;
       if (editingPet) {
-        // Update existing pet
+        // Update existing pet - use PATCH and FormData
         response = await fetch(`${API_BASE}/pet/my-pets/${editingPet.id}/`, {
           method: 'PATCH',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
-          body: JSON.stringify(petData),
+          body: formData,
         });
       } else {
-        // Create new pet
+        // Create new pet - use POST and FormData
         response = await fetch(`${API_BASE}/pet/my-pets/`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
-          body: JSON.stringify(petData),
+          body: formData,
         });
       }
 
       if (!response.ok) {
-        throw new Error(`Failed to ${editingPet ? 'update' : 'create'} pet: ${response.status}`);
+        const errorData = await response.json().catch(() => null);
+        throw new Error(`Failed to ${editingPet ? 'update' : 'create'} pet: ${response.status} - ${errorData?.message || 'Unknown error'}`);
       }
 
       showToast(`Pet ${editingPet ? 'updated' : 'added'} successfully`, 'success');
@@ -292,7 +369,7 @@ export default function ProfilePage() {
       // Refresh pets list
       await fetchPets();
       
-      // Reset form
+      // Reset form and image
       setPetForm({
         name: "",
         species: "",
@@ -309,12 +386,14 @@ export default function ProfilePage() {
         adoption_days: 1,
         currency: "USD"
       });
+      setPetImage(null);
+      setImagePreview(null);
       setEditingPet(null);
       setShowPetForm(false);
       
     } catch (err) {
       console.error('Error saving pet:', err);
-      showToast(`Failed to ${editingPet ? 'update' : 'add'} pet`, 'error');
+      showToast(`Failed to ${editingPet ? 'update' : 'add'} pet: ${err.message}`, 'error');
     }
   }
 
@@ -368,6 +447,13 @@ export default function ProfilePage() {
       adoption_days: pet.adoption_days || 1,
       currency: pet.currency || "USD"
     });
+    // Set image preview if pet has an image
+    if (pet.image) {
+      setImagePreview(`${API_BASE}${pet.image}`);
+    } else {
+      setImagePreview(null);
+    }
+    setPetImage(null);
     setShowPetForm(true);
   }
 
@@ -388,6 +474,8 @@ export default function ProfilePage() {
       adoption_days: 1,
       currency: "USD"
     });
+    setPetImage(null);
+    setImagePreview(null);
     setEditingPet(null);
     setShowPetForm(false);
   }
@@ -723,6 +811,82 @@ export default function ProfilePage() {
         ))}
       </section>
 
+      {/* 🏠 My Adoptions Section */}
+      <section style={{ background: "#fff", borderRadius: 8, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.08)", marginBottom: 20 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <h3 style={{ fontSize: "1.2rem", fontWeight: 700 }}>My Adoptions</h3>
+          <button
+            onClick={fetchAdoptions}
+            style={{
+              backgroundColor: "#f3f4f6",
+              color: "#111827",
+              padding: "6px 12px",
+              border: "1px solid #e5e7eb",
+              borderRadius: 6,
+              cursor: "pointer",
+              fontWeight: 600,
+            }}
+          >
+            Refresh
+          </button>
+        </div>
+
+        {/* Loading and Error States */}
+        {adoptionsLoading && <div style={{ textAlign: 'center', padding: 20 }}>Loading adoptions...</div>}
+        {adoptionsError && (
+          <div style={{ color: '#dc2626', padding: 12, background: '#fef2f2', borderRadius: 6, marginBottom: 16 }}>
+            Error loading adoptions: {adoptionsError}
+          </div>
+        )}
+
+        {/* Adoptions List */}
+        {!adoptionsLoading && !adoptionsError && adoptions.length === 0 ? (
+          <p>No adoptions found.</p>
+        ) : (
+          !adoptionsLoading && (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 800 }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid #eee", background: "#f8fafc" }}>
+                    <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>Pet Name</th>
+                    <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>Adoption Date</th>
+                    <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>Price Paid</th>
+                    <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>Status</th>
+                    <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>Remarks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {adoptions.map((adoption) => (
+                    <tr key={adoption.id} style={{ borderBottom: "1px solid #f3f4f6" }}>
+                      <td style={{ padding: "12px", fontWeight: 500 }}>{adoption.pet_name}</td>
+                      <td style={{ padding: "12px" }}>{new Date(adoption.adoption_date).toLocaleDateString()}</td>
+                      <td style={{ padding: "12px", fontWeight: 600, color: "#059669" }}>
+                        {adoption.currency || 'USD'} {parseFloat(adoption.price_paid).toFixed(2)}
+                      </td>
+                      <td style={{ padding: "12px" }}>
+                        <span style={{ 
+                          padding: "4px 8px", 
+                          borderRadius: 12, 
+                          fontSize: "0.75rem",
+                          fontWeight: 600,
+                          backgroundColor: adoption.is_confirmed ? "#dcfce7" : "#fef3c7",
+                          color: adoption.is_confirmed ? "#166534" : "#92400e"
+                        }}>
+                          {adoption.is_confirmed ? "Confirmed" : "Pending"}
+                        </span>
+                      </td>
+                      <td style={{ padding: "12px", color: "#6b7280" }}>
+                        {adoption.remarks || "No remarks"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
+        )}
+      </section>
+
       {/* 🐾 My Pets CRUD Section */}
       <section style={{ background: "#fff", borderRadius: 8, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.08)", marginBottom: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
@@ -769,86 +933,438 @@ export default function ProfilePage() {
 
         {/* Add/Edit Form */}
         {showPetForm && (
-          <form onSubmit={handleAddOrUpdatePet} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16, border: "1px solid #eee", padding: 16, borderRadius: 8 }}>
-            <input name="name" value={petForm.name} onChange={handlePetInputChange} placeholder="Pet Name" required />
-            <input name="species" value={petForm.species} onChange={handlePetInputChange} placeholder="Species (e.g. Dog, Cat)" required />
-            <input name="breed" value={petForm.breed} onChange={handlePetInputChange} placeholder="Breed" required />
-            <input name="age" type="number" value={petForm.age} onChange={handlePetInputChange} placeholder="Age" required />
-            <select name="gender" value={petForm.gender} onChange={handlePetInputChange} required>
-              <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
-            <input name="color" value={petForm.color} onChange={handlePetInputChange} placeholder="Color" required />
-            <input name="weight" type="number" step="0.1" value={petForm.weight} onChange={handlePetInputChange} placeholder="Weight (kg)" required />
-            <input name="health_issues" value={petForm.health_issues} onChange={handlePetInputChange} placeholder="Health Issues" />
-            <input name="vaccination_status" value={petForm.vaccination_status} onChange={handlePetInputChange} placeholder="Vaccination Status" />
-            <input name="adoption_price" type="number" step="0.01" value={petForm.adoption_price} onChange={handlePetInputChange} placeholder="Adoption Price" />
-            <input name="adoption_days" type="number" value={petForm.adoption_days} onChange={handlePetInputChange} placeholder="Adoption Days" />
-            <select name="currency" value={petForm.currency} onChange={handlePetInputChange}>
-              <option value="USD">USD</option>
-              <option value="NPR">NPR</option>
-            </select>
-            <div style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", gap: 8 }}>
-              <input 
-                name="is_available_for_adoption" 
-                type="checkbox" 
-                checked={petForm.is_available_for_adoption} 
-                onChange={handlePetInputChange} 
-              />
-              <label>Available for Adoption</label>
-            </div>
-            <textarea 
-              name="description" 
-              value={petForm.description} 
-              onChange={handlePetInputChange} 
-              placeholder="Description" 
-              style={{ gridColumn: "1 / -1" }}
-              rows={3}
-            ></textarea>
-            <div style={{ gridColumn: "1 / -1", display: "flex", gap: 8 }}>
-              <button type="submit" style={{ background: "#2563eb", color: "#fff", padding: 10, border: "none", borderRadius: 6, cursor: "pointer", flex: 1 }}>
-                {editingPet ? "Update Pet" : "Add Pet"}
-              </button>
-              <button type="button" onClick={handleCancelForm} style={{ background: "#6b7280", color: "#fff", padding: 10, border: "none", borderRadius: 6, cursor: "pointer", flex: 1 }}>
-                Cancel
-              </button>
-            </div>
-          </form>
+          <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: 20, marginBottom: 20 }}>
+            <h4 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: 16, color: "#1e293b" }}>
+              {editingPet ? "Edit Pet" : "Add New Pet"}
+            </h4>
+            <form onSubmit={handleAddOrUpdatePet} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              {/* Image Upload */}
+              <div style={{ gridColumn: "1 / -1" }}>
+                <h5 style={{ fontSize: "0.9rem", fontWeight: 600, color: "#475569", marginBottom: 12 }}>Pet Image</h5>
+                <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+                  <div style={{ flex: 1 }}>
+                    <input 
+                      id="pet-image"
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      style={{ 
+                        width: '100%', 
+                        padding: '10px 12px', 
+                        borderRadius: 6, 
+                        border: '1px solid #d1d5db', 
+                        fontSize: 14,
+                        background: 'white'
+                      }}
+                    />
+                    <p style={{ fontSize: "0.8rem", color: "#6b7280", marginTop: 4 }}>
+                      Upload a clear photo of your pet (JPG, PNG, GIF)
+                    </p>
+                  </div>
+                  {(imagePreview || (editingPet && editingPet.image)) && (
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                      <img 
+                        src={imagePreview || `${API_BASE}${editingPet.image}`} 
+                        alt="Pet preview" 
+                        style={{ 
+                          width: 120, 
+                          height: 120, 
+                          borderRadius: 8, 
+                          objectFit: 'cover',
+                          border: '2px solid #e5e7eb'
+                        }} 
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        style={{
+                          position: 'absolute',
+                          top: -8,
+                          right: -8,
+                          background: '#ef4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: 24,
+                          height: 24,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '12px',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Basic Information */}
+              <div style={{ gridColumn: "1 / -1", marginBottom: 8 }}>
+                <h5 style={{ fontSize: "0.9rem", fontWeight: 600, color: "#475569", marginBottom: 12 }}>Basic Information</h5>
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }}>Pet Name *</label>
+                <input 
+                  name="name" 
+                  value={petForm.name} 
+                  onChange={handlePetInputChange} 
+                  placeholder="Enter pet name"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
+                  required 
+                />
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }}>Species *</label>
+                <input 
+                  name="species" 
+                  value={petForm.species} 
+                  onChange={handlePetInputChange} 
+                  placeholder="e.g. Dog, Cat, Rabbit"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
+                  required 
+                />
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }}>Breed *</label>
+                <input 
+                  name="breed" 
+                  value={petForm.breed} 
+                  onChange={handlePetInputChange} 
+                  placeholder="Enter breed"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
+                  required 
+                />
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }}>Age (years) *</label>
+                <input 
+                  name="age" 
+                  type="number" 
+                  value={petForm.age} 
+                  onChange={handlePetInputChange} 
+                  placeholder="Enter age"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
+                  required 
+                />
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }}>Gender *</label>
+                <select 
+                  name="gender" 
+                  value={petForm.gender} 
+                  onChange={handlePetInputChange} 
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14, background: 'white' }}
+                  required
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }}>Color *</label>
+                <input 
+                  name="color" 
+                  value={petForm.color} 
+                  onChange={handlePetInputChange} 
+                  placeholder="Enter color"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
+                  required 
+                />
+              </div>
+
+              {/* Health Information */}
+              <div style={{ gridColumn: "1 / -1", marginBottom: 8, marginTop: 8 }}>
+                <h5 style={{ fontSize: "0.9rem", fontWeight: 600, color: "#475569", marginBottom: 12 }}>Health Information</h5>
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }}>Weight (kg) *</label>
+                <input 
+                  name="weight" 
+                  type="number" 
+                  step="0.1" 
+                  value={petForm.weight} 
+                  onChange={handlePetInputChange} 
+                  placeholder="Enter weight"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
+                  required 
+                />
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }}>Vaccination Status</label>
+                <input 
+                  name="vaccination_status" 
+                  value={petForm.vaccination_status} 
+                  onChange={handlePetInputChange} 
+                  placeholder="e.g. Fully vaccinated"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
+                />
+              </div>
+              
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }}>Health Issues</label>
+                <input 
+                  name="health_issues" 
+                  value={petForm.health_issues} 
+                  onChange={handlePetInputChange} 
+                  placeholder="Any health concerns or issues"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
+                />
+              </div>
+
+              {/* Adoption Information */}
+              <div style={{ gridColumn: "1 / -1", marginBottom: 8, marginTop: 8 }}>
+                <h5 style={{ fontSize: "0.9rem", fontWeight: 600, color: "#475569", marginBottom: 12 }}>Adoption Information</h5>
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }}>Adoption Price</label>
+                <input 
+                  name="adoption_price" 
+                  type="number" 
+                  step="0.01" 
+                  value={petForm.adoption_price} 
+                  onChange={handlePetInputChange} 
+                  placeholder="0.00"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
+                />
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }}>Currency</label>
+                <select 
+                  name="currency" 
+                  value={petForm.currency} 
+                  onChange={handlePetInputChange} 
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14, background: 'white' }}
+                >
+                  <option value="USD">USD ($)</option>
+                  <option value="NPR">NPR (रू)</option>
+                </select>
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }}>Adoption Period (days) *</label>
+                <input 
+                  name="adoption_days" 
+                  type="number" 
+                  value={petForm.adoption_days} 
+                  onChange={handlePetInputChange} 
+                  placeholder="1"
+                  min="1"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
+                  required
+                />
+                <p style={{ fontSize: "0.8rem", color: "#6b7280", marginTop: 4 }}>
+                  How many days the adoption will last
+                </p>
+              </div>
+              
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <input 
+                  name="is_available_for_adoption" 
+                  type="checkbox" 
+                  checked={petForm.is_available_for_adoption} 
+                  onChange={handlePetInputChange} 
+                  style={{ width: 16, height: 16 }}
+                />
+                <label style={{ fontSize: 14, fontWeight: 500 }}>Available for Adoption</label>
+              </div>
+
+              {/* Description */}
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }}>Description</label>
+                <textarea 
+                  name="description" 
+                  value={petForm.description} 
+                  onChange={handlePetInputChange} 
+                  placeholder="Tell us about your pet's personality, habits, and any special needs..."
+                  style={{ 
+                    width: '100%', 
+                    padding: '12px', 
+                    borderRadius: 6, 
+                    border: '1px solid #d1d5db', 
+                    fontSize: 14,
+                    minHeight: 80,
+                    resize: 'vertical',
+                    fontFamily: 'inherit'
+                  }}
+                  rows={4}
+                ></textarea>
+              </div>
+
+              {/* Form Actions */}
+              <div style={{ gridColumn: "1 / -1", display: "flex", gap: 12, justifyContent: "flex-end", marginTop: 8 }}>
+                <button 
+                  type="button" 
+                  onClick={handleCancelForm}
+                  style={{ 
+                    background: "#6b7280", 
+                    color: "#fff", 
+                    padding: "10px 20px", 
+                    border: "none", 
+                    borderRadius: 6, 
+                    cursor: "pointer", 
+                    fontWeight: 600,
+                    fontSize: 14
+                  }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  style={{ 
+                    background: "#2563eb", 
+                    color: "#fff", 
+                    padding: "10px 20px", 
+                    border: "none", 
+                    borderRadius: 6, 
+                    cursor: "pointer", 
+                    fontWeight: 600,
+                    fontSize: 14
+                  }}
+                >
+                  {editingPet ? "Update Pet" : "Add Pet"}
+                </button>
+              </div>
+            </form>
+          </div>
         )}
 
         {/* Pets List */}
         {!petsLoading && !petsError && pets.length === 0 ? (
-          <p>No pets added yet.</p>
+          <div style={{ textAlign: 'center', padding: 40, color: '#6b7280' }}>
+            <p>No pets added yet.</p>
+            <button
+              onClick={() => setShowPetForm(true)}
+              style={{
+                backgroundColor: "#2563eb",
+                color: "#fff",
+                padding: "10px 16px",
+                border: "none",
+                borderRadius: 6,
+                cursor: "pointer",
+                fontWeight: 600,
+                marginTop: 12
+              }}
+            >
+              Add Your First Pet
+            </button>
+          </div>
         ) : (
           !petsLoading && (
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 800 }}>
                 <thead>
-                  <tr style={{ borderBottom: "1px solid #eee" }}>
-                    <th style={{ textAlign: "left", padding: "8px" }}>Name</th>
-                    <th>Species</th>
-                    <th>Breed</th>
-                    <th>Age</th>
-                    <th>Gender</th>
-                    <th>Adoption Price</th>
-                    <th>Available</th>
-                    <th>Actions</th>
+                  <tr style={{ borderBottom: "1px solid #eee", background: "#f8fafc" }}>
+                    <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>Image</th>
+                    <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>Name</th>
+                    <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>Species</th>
+                    <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>Breed</th>
+                    <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>Age</th>
+                    <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>Adoption Price</th>
+                    <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>Adoption Days</th>
+                    <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>Available</th>
+                    <th style={{ textAlign: "center", padding: "12px", fontWeight: 600 }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pets.map((pet) => (
                     <tr key={pet.id} style={{ borderBottom: "1px solid #f3f4f6" }}>
-                      <td style={{ padding: "8px" }}>{pet.name}</td>
-                      <td>{pet.species}</td>
-                      <td>{pet.breed}</td>
-                      <td>{pet.age}</td>
-                      <td>{pet.gender}</td>
-                      <td>{pet.currency} {pet.adoption_price}</td>
-                      <td>{pet.is_available_for_adoption ? 'Yes' : 'No'}</td>
-                      <td style={{ display: "flex", gap: 6, justifyContent: "center" }}>
-                        <button onClick={() => handleEditPet(pet)} style={{ background: "#dbeafe", border: "none", padding: "4px 8px", borderRadius: 4, cursor: "pointer" }}>Edit</button>
-                        <button onClick={() => handleDeletePet(pet.id)} style={{ background: "#fee2e2", border: "none", padding: "4px 8px", borderRadius: 4, cursor: "pointer", color: "#991b1b" }}>Delete</button>
+                      <td style={{ padding: "12px" }}>
+                        {pet.image ? (
+                          <img 
+                            src={`${API_BASE}${pet.image}`} 
+                            alt={pet.name}
+                            style={{ 
+                              width: 50, 
+                              height: 50, 
+                              borderRadius: 6, 
+                              objectFit: 'cover',
+                              border: '1px solid #e5e7eb'
+                            }} 
+                          />
+                        ) : (
+                          <div style={{ 
+                            width: 50, 
+                            height: 50, 
+                            borderRadius: 6, 
+                            background: '#f3f4f6',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#9ca3af',
+                            fontSize: '0.75rem'
+                          }}>
+                            No Image
+                          </div>
+                        )}
+                      </td>
+                      <td style={{ padding: "12px", fontWeight: 500 }}>{pet.name}</td>
+                      <td style={{ padding: "12px" }}>{pet.species}</td>
+                      <td style={{ padding: "12px" }}>{pet.breed}</td>
+                      <td style={{ padding: "12px" }}>{pet.age} years</td>
+                      <td style={{ padding: "12px", fontWeight: 600 }}>
+                        {pet.currency} {parseFloat(pet.adoption_price || 0).toFixed(2)}
+                      </td>
+                      <td style={{ padding: "12px" }}>
+                        {pet.adoption_days} days
+                      </td>
+                      <td style={{ padding: "12px" }}>
+                        <span style={{ 
+                          padding: "4px 8px", 
+                          borderRadius: 12, 
+                          fontSize: "0.75rem",
+                          fontWeight: 600,
+                          backgroundColor: pet.is_available_for_adoption ? "#dcfce7" : "#f3f4f6",
+                          color: pet.is_available_for_adoption ? "#166534" : "#6b7280"
+                        }}>
+                          {pet.is_available_for_adoption ? "Yes" : "No"}
+                        </span>
+                      </td>
+                      <td style={{ padding: "12px", display: "flex", gap: 8, justifyContent: "center" }}>
+                        <button 
+                          onClick={() => handleEditPet(pet)} 
+                          style={{ 
+                            background: "#dbeafe", 
+                            color: "#1e40af",
+                            border: "none", 
+                            padding: "6px 12px", 
+                            borderRadius: 4, 
+                            cursor: "pointer",
+                            fontSize: "0.875rem",
+                            fontWeight: 500
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDeletePet(pet.id)} 
+                          style={{ 
+                            background: "#fee2e2", 
+                            color: "#dc2626",
+                            border: "none", 
+                            padding: "6px 12px", 
+                            borderRadius: 4, 
+                            cursor: "pointer",
+                            fontSize: "0.875rem",
+                            fontWeight: 500
+                          }}
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))}

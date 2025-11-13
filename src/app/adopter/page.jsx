@@ -248,17 +248,18 @@ function AdoptPage() {
               </div>
               <div style={{ padding: '20px' }}>
                 <h3 style={{ margin: '0 0 5px 0', color: '#333', fontSize: '1.3rem' }}>{pet.name}</h3>
-                <p style={{ margin: '0 0 10px 0', color: '#666', fontSize: '0.95rem' }}>
-                  {pet.breed} - {pet.type}
+                
+                <p style={{ margin: '0 0 8px 0', color: '#888', fontSize: '0.9rem' }}>
+                  Location: {pet.location}
                 </p>
                 <p style={{ margin: '0 0 8px 0', color: '#888', fontSize: '0.9rem' }}>
-                  📍 {pet.location}
+                  Age:{pet.age}
                 </p>
                 <p style={{ margin: '0 0 8px 0', color: '#888', fontSize: '0.9rem' }}>
-                  ⏰ {pet.age}
+                   Adoption Days:{pet.adoption_days}
                 </p>
                 <p style={{ margin: '10px 0 15px 0', color: '#555', fontSize: '0.9rem', lineHeight: '1.5' }}>
-                  {pet.description}
+                  Description: {pet.description}
                 </p>
                 {pet.is_available_for_adoption ? (
                   <Link href={`/adopter/pet/${pet.id}`}>
@@ -307,6 +308,6 @@ function AdoptPage() {
     </div>
   );
 }
-// change this page and profile to see added pet in profile to adopter if previous code needed it is in github
+
 
 export default AdoptPage;

@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  // initialize from localStorage if available
+ 
   const [cartItems, setCartItems] = useState(() => {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
@@ -12,12 +12,11 @@ export function CartProvider({ children }) {
         return raw ? JSON.parse(raw) : [];
       }
     } catch (err) {
-      // ignore parse errors
+      
     }
     return [];
   });
 
-  // persist cart to localStorage
   useEffect(() => {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
@@ -41,6 +40,51 @@ export function CartProvider({ children }) {
       }
     });
   };
+  
+const createOrder = async () => {
+  if (cartItems.length === 0) {
+    throw new Error("Cart is empty");
+  }
+
+  try {
+    const orderData = {
+      items: cartItems.map(item => ({
+        product: item.id,
+        quantity: item.quantity,
+        unit_price: item.discount_price ?? item.price
+      }))
+    };
+
+    console.log('Sending order data:', orderData);
+    console.log('API URL:', `${BASE_URL}/shop/orders/`);
+
+    const response = await fetch(`${BASE_URL}/shop/orders/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      
+       
+      },
+      body: JSON.stringify(orderData)
+    });
+
+    console.log('Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
+      throw new Error(`HTTP error! status: ${response.status}, details: ${errorText}`);
+    }
+
+    const order = await response.json();
+    console.log('Order created successfully:', order);
+    setCurrentOrder(order);
+    return order;
+  } catch (error) {
+    console.error("Error creating order:", error);
+    throw error;
+  }
+};
 
   const removeFromCart = (productId) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
@@ -84,6 +128,8 @@ export function CartProvider({ children }) {
       {children}
     </CartContext.Provider>
   );
+
+  
 }
 
 export function useCart() {

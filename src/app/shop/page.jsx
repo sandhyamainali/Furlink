@@ -8,7 +8,7 @@ import { useCart } from "@/context/cartContext";
 import { API_BASE } from '@/lib/config';
 
 export default function ShopPage() {
-  const [categories, setCategories] = useState([]); // {id,name}
+  const [categories, setCategories] = useState([]); 
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);

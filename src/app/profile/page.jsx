@@ -801,7 +801,7 @@ export default function ProfilePage() {
       </section>
 
       {/* 🛒 Cart */}
-      <section style={{ background: "#fff", borderRadius: 8, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.08)", marginBottom: 20 }}>
+      {/* <section style={{ background: "#fff", borderRadius: 8, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.08)", marginBottom: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <h3 style={{ fontSize: "1.2rem", fontWeight: 700 }}>Cart</h3>
           <Link href="/cart" className="login-button">Open Cart</Link>
@@ -809,7 +809,7 @@ export default function ProfilePage() {
         {cartItems.length === 0 ? <p>Your cart is empty.</p> : cartItems.map((item) => (
           <div key={item.id}>{item.title}</div>
         ))}
-      </section>
+      </section> */}
 
       {/* 🏠 My Adoptions Section */}
       <section style={{ background: "#fff", borderRadius: 8, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.08)", marginBottom: 20 }}>

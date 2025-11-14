@@ -74,7 +74,7 @@ export default function Navbar() {
             </div>
           </li>
           <li><Link href="/adopter" className="nav-link px-3 py-2" onClick={closeMenu}>Adoption</Link></li>
-          
+           <li><Link href="/orderedlist" className="nav-link px-3 py-2" onClick={closeMenu}>Order List</Link></li>
           {/* Mobile Login Button */}
           <li className="mobile-login">
             <ProfileControls/>

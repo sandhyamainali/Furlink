@@ -5,11 +5,13 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { FaShoppingCart } from "react-icons/fa";
 import CartCount from "./CartCount";
+import { useUser } from "@/context/userContext";
 
 const ProfileControls = dynamic(() => import("./ProfileControls"), { ssr: false });
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isAuthenticated } = useUser();
 
   const toggleMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -74,7 +76,9 @@ export default function Navbar() {
             </div>
           </li>
           <li><Link href="/adopter" className="nav-link px-3 py-2" onClick={closeMenu}>Adoption</Link></li>
-           <li><Link href="/orderedlist" className="nav-link px-3 py-2" onClick={closeMenu}>Order List</Link></li>
+          {isAuthenticated && (
+            <li><Link href="/orderedlist" className="nav-link px-3 py-2" onClick={closeMenu}>My Orders</Link></li>
+          )}
           {/* Mobile Login Button */}
           <li className="mobile-login">
             <ProfileControls/>

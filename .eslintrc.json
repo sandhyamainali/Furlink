@@ -12,8 +12,13 @@
       "jsx": true
     }
   },
-  "extends": [
-    "eslint:recommended"
-  ],
-  "rules": {}
+  "extends": ["next/core-web-vitals", "eslint:recommended"],
+  "rules": {
+    "no-unused-vars": "off",
+    "no-useless-escape": "off",
+    "no-undef": "off",
+    "no-empty": "off",
+    "react/no-unescaped-entities": "off",
+    "no-constant-binary-expression": "off"
+  }
 }

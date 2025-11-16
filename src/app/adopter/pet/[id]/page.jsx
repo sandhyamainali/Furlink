@@ -21,7 +21,7 @@ export default function PetProfilePage({ params }) {
     const fetchPet = async () => {
       const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
       if (!token) {
-        router.replace('/login');
+        router.replace(`/login?returnUrl=/adopter/pet/${params.id}`);
         return;
       }
 
@@ -30,7 +30,7 @@ export default function PetProfilePage({ params }) {
           headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
         });
         if (res.status === 401 || res.status === 403) {
-          router.replace('/login');
+          router.replace(`/login?returnUrl=/adopter/pet/${params.id}`);
           return;
         }
         if (!res.ok) throw new Error(`API error ${res.status}`);
@@ -77,7 +77,7 @@ export default function PetProfilePage({ params }) {
       <div style={{ padding: 40, textAlign: 'center' }}>
         <h2 style={{ fontSize: 20, marginBottom: 8 }}>Unable to load pet</h2>
         <p style={{ color: '#666' }}>{error}</p>
-        <Link href="/login" style={{ color: '#a0632b', marginTop: 12, display: 'inline-block' }}>Login</Link>
+        <Link href={`/login?returnUrl=/adopter/pet/${params.id}`} style={{ color: '#a0632b', marginTop: 12, display: 'inline-block' }}>Login</Link>
       </div>
     );
   }

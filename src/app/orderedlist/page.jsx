@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { API_BASE } from '@/lib/config';
-import { FaArrowLeft, FaShoppingBag, FaCalendarAlt, FaCreditCard, FaEye, FaChevronDown, FaChevronUp, FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
+import { FaArrowLeft, FaShoppingBag, FaCalendarAlt, FaCreditCard, FaEye, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
 export default function OrdersPage() {
   const router = useRouter();
@@ -73,8 +73,8 @@ export default function OrdersPage() {
   };
 
   const getSortIcon = (key) => {
-    if (sortConfig.key !== key) return <FaSort className="text-gray-400" />;
-    return sortConfig.direction === 'asc' ? <FaSortUp className="text-blue-600" /> : <FaSortDown className="text-blue-600" />;
+    if (sortConfig.key !== key) return '↕️';
+    return sortConfig.direction === 'asc' ? '↑' : '↓';
   };
 
   const formatDate = (dateString) => {
@@ -90,7 +90,7 @@ export default function OrdersPage() {
   const formatCurrency = (amount, currency) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: currency || 'USD',
+      currency: currency || 'NPR',
     }).format(amount);
   };
 
@@ -99,11 +99,22 @@ export default function OrdersPage() {
   };
 
   const TableHeader = ({ children, sortKey, className = '' }) => (
-    <th 
-      className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50 ${className}`}
+    <th
+      style={{
+        padding: '12px 24px',
+        textAlign: 'left',
+        fontSize: '12px',
+        fontWeight: '500',
+        color: '#6b7280',
+        textTransform: 'uppercase',
+        letterSpacing: '0.05em',
+        cursor: sortKey ? 'pointer' : 'default',
+        backgroundColor: '#f9fafb',
+        borderBottom: '1px solid #e5e7eb'
+      }}
       onClick={() => sortKey && handleSort(sortKey)}
     >
-      <div className="flex items-center space-x-1">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
         <span>{children}</span>
         {sortKey && getSortIcon(sortKey)}
       </div>
@@ -112,10 +123,18 @@ export default function OrdersPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading your orders...</p>
+      <div style={{ minHeight: '100vh', backgroundColor: '#fef9f4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #dc9a6a',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto'
+          }}></div>
+          <p style={{ marginTop: '16px', color: '#666', fontSize: '16px' }}>Loading your orders...</p>
         </div>
       </div>
     );
@@ -123,12 +142,21 @@ export default function OrdersPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-600 text-lg mb-4">{error}</div>
+      <div style={{ minHeight: '100vh', backgroundColor: '#fef9f4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ color: '#dc2626', fontSize: '18px', marginBottom: '16px' }}>{error}</div>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#dc9a6a',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: '500'
+            }}
           >
             Try Again
           </button>
@@ -138,48 +166,82 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div style={{ minHeight: '100vh', backgroundColor: '#fef9f4', padding: '40px 20px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+        <div style={{ marginBottom: '40px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
               <button
                 onClick={() => router.back()}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '10px 16px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151',
+                  backgroundColor: 'white',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                  cursor: 'pointer'
+                }}
               >
-                <FaArrowLeft className="mr-2 h-4 w-4" />
+                <FaArrowLeft style={{ marginRight: '8px', width: '16px', height: '16px' }} />
                 Back
               </button>
-              <h1 className="text-2xl font-bold text-gray-900">Order History</h1>
+              <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937' }}>Order History</h1>
             </div>
-            <div className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg">
-              <FaShoppingBag className="h-5 w-5" />
-              <span className="font-semibold">{orders.length} Orders</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#dc9a6a', color: 'white', padding: '10px 16px', borderRadius: '12px' }}>
+              <FaShoppingBag style={{ width: '20px', height: '20px' }} />
+              <span style={{ fontWeight: '600' }}>{orders.length} Orders</span>
             </div>
           </div>
-          <p className="mt-2 text-gray-600">Manage and view your completed orders</p>
+          <p style={{ marginTop: '8px', color: '#6b7280' }}>Manage and view your completed orders</p>
         </div>
 
         {/* Orders Table */}
         {orders.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-            <FaShoppingBag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No orders found</h3>
-            <p className="text-gray-500 mb-6">You haven't placed any orders yet.</p>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            border: '1px solid #f0e1cf',
+            padding: '48px 24px',
+            textAlign: 'center'
+          }}>
+            <FaShoppingBag style={{ width: '48px', height: '48px', color: '#9ca3af', margin: '0 auto 16px auto' }} />
+            <h3 style={{ fontSize: '18px', fontWeight: '500', color: '#1f2937', marginBottom: '8px' }}>No orders found</h3>
+            <p style={{ color: '#6b7280', marginBottom: '24px' }}>You haven't placed any orders yet.</p>
             <button
-              onClick={() => router.push('/products')}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              onClick={() => router.push('/shop')}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#dc9a6a',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: '500'
+              }}
             >
               Start Shopping
             </button>
           </div>
         ) : (
-          <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            border: '1px solid #f0e1cf',
+            overflow: 'hidden'
+          }}>
             {/* Table */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ minWidth: '100%', borderCollapse: 'collapse' }}>
+                <thead style={{ backgroundColor: '#f9fafb' }}>
                   <tr>
                     <TableHeader sortKey="id">Order ID</TableHeader>
                     <TableHeader sortKey="created_at">Date</TableHeader>
@@ -189,52 +251,73 @@ export default function OrdersPage() {
                     <TableHeader className="text-center">Actions</TableHeader>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody style={{ backgroundColor: 'white' }}>
                   {currentOrders.map((order) => {
                     const totalItems = order.items.reduce((sum, item) => sum + item.quantity, 0);
                     const isExpanded = expandedOrder === order.id;
 
                     return (
                       <>
-                        <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">#{order.id}</div>
+                        <tr key={order.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                          <td style={{ padding: '16px 24px', whiteSpace: 'nowrap' }}>
+                            <div style={{ fontSize: '14px', fontWeight: '500', color: '#1f2937' }}>#{order.id}</div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900 flex items-center">
-                              <FaCalendarAlt className="h-4 w-4 text-gray-400 mr-2" />
+                          <td style={{ padding: '16px 24px', whiteSpace: 'nowrap' }}>
+                            <div style={{ fontSize: '14px', color: '#1f2937', display: 'flex', alignItems: 'center' }}>
+                              <FaCalendarAlt style={{ width: '16px', height: '16px', color: '#9ca3af', marginRight: '8px' }} />
                               {formatDate(order.created_at)}
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
+                          <td style={{ padding: '16px 24px', whiteSpace: 'nowrap' }}>
+                            <div style={{ fontSize: '14px', color: '#1f2937' }}>
                               {totalItems} item{totalItems !== 1 ? 's' : ''}
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-semibold text-gray-900 flex items-center">
-                              <FaCreditCard className="h-4 w-4 text-gray-400 mr-1" />
+                          <td style={{ padding: '16px 24px', whiteSpace: 'nowrap' }}>
+                            <div style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937', display: 'flex', alignItems: 'center' }}>
+                              <FaCreditCard style={{ width: '16px', height: '16px', color: '#9ca3af', marginRight: '4px' }} />
                               {formatCurrency(order.total_amount, order.currency)}
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 capitalize">
+                          <td style={{ padding: '16px 24px', whiteSpace: 'nowrap' }}>
+                            <span style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              padding: '2px 10px',
+                              borderRadius: '12px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: '#dcfce7',
+                              color: '#166534',
+                              textTransform: 'capitalize'
+                            }}>
                               {order.status}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <td style={{ padding: '16px 24px', whiteSpace: 'nowrap', textAlign: 'center' }}>
                             <button
                               onClick={() => toggleOrderExpansion(order.id)}
-                              className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                padding: '6px 12px',
+                                border: '1px solid #d1d5db',
+                                borderRadius: '6px',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                color: '#374151',
+                                backgroundColor: 'white',
+                                cursor: 'pointer'
+                              }}
                             >
                               {isExpanded ? (
                                 <>
-                                  <FaChevronUp className="h-4 w-4 mr-1" />
+                                  <FaChevronUp style={{ width: '16px', height: '16px', marginRight: '4px' }} />
                                   Hide
                                 </>
                               ) : (
                                 <>
-                                  <FaEye className="h-4 w-4 mr-1" />
+                                  <FaEye style={{ width: '16px', height: '16px', marginRight: '4px' }} />
                                   View
                                 </>
                               )}
@@ -243,47 +326,61 @@ export default function OrdersPage() {
                         </tr>
                         {isExpanded && (
                           <tr>
-                            <td colSpan="6" className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                              <div className="space-y-4">
-                                <h4 className="text-md font-semibold text-gray-900">Order Items</h4>
-                                <div className="grid gap-4">
+                            <td colSpan="6" style={{ padding: '16px 24px', backgroundColor: '#f9fafb', borderTop: '1px solid #e5e7eb' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#1f2937' }}>Order Items</h4>
+                                <div style={{ display: 'grid', gap: '16px' }}>
                                   {order.items.map((item) => (
-                                    <div key={item.id} className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200">
-                                      <div className="flex items-center space-x-4 flex-1">
+                                    <div key={item.id} style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      padding: '16px',
+                                      backgroundColor: 'white',
+                                      borderRadius: '8px',
+                                      border: '1px solid #e5e7eb'
+                                    }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
                                         <img
                                           src={item.product.image}
                                           alt={item.product.name}
-                                          className="w-16 h-16 object-cover rounded-md"
+                                          style={{ width: '64px', height: '64px', objectFit: 'cover', borderRadius: '6px' }}
                                         />
-                                        <div className="flex-1 min-w-0">
-                                          <h5 className="text-sm font-medium text-gray-900">
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                          <h5 style={{ fontSize: '14px', fontWeight: '500', color: '#1f2937' }}>
                                             {item.product.name}
                                           </h5>
-                                          <p className="text-sm text-gray-500 mt-1">
+                                          <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>
                                             Category: {item.product.category.name}
                                           </p>
-                                          <p className="text-xs text-gray-400 mt-1 line-clamp-2">
+                                          <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                             {item.product.description}
                                           </p>
                                         </div>
                                       </div>
-                                      <div className="text-right">
-                                        <p className="text-sm font-medium text-gray-900">
+                                      <div style={{ textAlign: 'right' }}>
+                                        <p style={{ fontSize: '14px', fontWeight: '500', color: '#1f2937' }}>
                                           {formatCurrency(item.unit_price, order.currency)}
                                         </p>
-                                        <p className="text-sm text-gray-500">
+                                        <p style={{ fontSize: '14px', color: '#6b7280' }}>
                                           Qty: {item.quantity}
                                         </p>
-                                        <p className="text-sm font-medium text-green-600 mt-1">
+                                        <p style={{ fontSize: '14px', fontWeight: '500', color: '#16a34a', marginTop: '4px' }}>
                                           Subtotal: {formatCurrency(item.line_total, order.currency)}
                                         </p>
                                       </div>
                                     </div>
                                   ))}
                                 </div>
-                                <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-                                  <span className="text-sm font-medium text-gray-600">Total Amount:</span>
-                                  <span className="text-lg font-bold text-gray-900">
+                                <div style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  paddingTop: '16px',
+                                  borderTop: '1px solid #e5e7eb'
+                                }}>
+                                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#4b5563' }}>Total Amount:</span>
+                                  <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#1f2937' }}>
                                     {formatCurrency(order.total_amount, order.currency)}
                                   </span>
                                 </div>
@@ -300,9 +397,16 @@ export default function OrdersPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="bg-white px-6 py-3 border-t border-gray-200 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-700">
+              <div style={{
+                backgroundColor: 'white',
+                padding: '12px 24px',
+                borderTop: '1px solid #e5e7eb',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '14px', color: '#374151' }}>
                     Show
                   </span>
                   <select
@@ -311,32 +415,54 @@ export default function OrdersPage() {
                       setItemsPerPage(Number(e.target.value));
                       setCurrentPage(1);
                     }}
-                    className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    style={{
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      padding: '4px 8px',
+                      fontSize: '14px',
+                      outline: 'none'
+                    }}
                   >
                     <option value={5}>5</option>
                     <option value={10}>10</option>
                     <option value={25}>25</option>
                     <option value={50}>50</option>
                   </select>
-                  <span className="text-sm text-gray-700">
+                  <span style={{ fontSize: '14px', color: '#374151' }}>
                     per page
                   </span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-700">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '14px', color: '#374151' }}>
                     Page {currentPage} of {totalPages}
                   </span>
                   <button
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
-                    className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                    style={{
+                      padding: '4px 12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      backgroundColor: currentPage === 1 ? '#f9fafb' : 'white',
+                      color: currentPage === 1 ? '#9ca3af' : '#374151',
+                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+                    }}
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
-                    className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                    style={{
+                      padding: '4px 12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      backgroundColor: currentPage === totalPages ? '#f9fafb' : 'white',
+                      color: currentPage === totalPages ? '#9ca3af' : '#374151',
+                      cursor: currentPage === totalPages ? 'not-allowed' : 'pointer'
+                    }}
                   >
                     Next
                   </button>
@@ -348,42 +474,77 @@ export default function OrdersPage() {
 
         {/* Summary Stats */}
         {orders.length > 0 && (
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className="bg-blue-100 p-3 rounded-lg">
-                  <FaShoppingBag className="h-6 w-6 text-blue-600" />
+          <div style={{
+            marginTop: '32px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '24px'
+          }}>
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: '1px solid #f0e1cf',
+              padding: '24px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{
+                  backgroundColor: '#fef3c7',
+                  padding: '12px',
+                  borderRadius: '12px'
+                }}>
+                  <FaShoppingBag style={{ width: '24px', height: '24px', color: '#dc9a6a' }} />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                  <p className="text-2xl font-bold text-gray-900">{orders.length}</p>
+                <div style={{ marginLeft: '16px' }}>
+                  <p style={{ fontSize: '14px', fontWeight: '500', color: '#6b7280' }}>Total Orders</p>
+                  <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>{orders.length}</p>
                 </div>
               </div>
             </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className="bg-green-100 p-3 rounded-lg">
-                  <FaCreditCard className="h-6 w-6 text-green-600" />
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: '1px solid #f0e1cf',
+              padding: '24px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{
+                  backgroundColor: '#dcfce7',
+                  padding: '12px',
+                  borderRadius: '12px'
+                }}>
+                  <FaCreditCard style={{ width: '24px', height: '24px', color: '#16a34a' }} />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Spent</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                <div style={{ marginLeft: '16px' }}>
+                  <p style={{ fontSize: '14px', fontWeight: '500', color: '#6b7280' }}>Total Spent</p>
+                  <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>
                     {formatCurrency(
                       orders.reduce((sum, order) => sum + parseFloat(order.total_amount), 0),
-                      orders[0]?.currency || 'USD'
+                      orders[0]?.currency || 'NPR'
                     )}
                   </p>
                 </div>
               </div>
             </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className="bg-purple-100 p-3 rounded-lg">
-                  <FaShoppingBag className="h-6 w-6 text-purple-600" />
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: '1px solid #f0e1cf',
+              padding: '24px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{
+                  backgroundColor: '#e9d5ff',
+                  padding: '12px',
+                  borderRadius: '12px'
+                }}>
+                  <FaShoppingBag style={{ width: '24px', height: '24px', color: '#8b5cf6' }} />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Items</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                <div style={{ marginLeft: '16px' }}>
+                  <p style={{ fontSize: '14px', fontWeight: '500', color: '#6b7280' }}>Total Items</p>
+                  <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>
                     {orders.reduce((sum, order) => sum + order.items.reduce((itemSum, item) => itemSum + item.quantity, 0), 0)}
                   </p>
                 </div>

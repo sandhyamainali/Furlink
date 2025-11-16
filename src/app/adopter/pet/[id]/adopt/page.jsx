@@ -26,7 +26,7 @@ export default function AdoptRequestForm({ params }) {
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
         if (!token) {
-          router.replace('/login');
+          router.replace(`/login?returnUrl=/adopter/pet/${id}/adopt`);
           return;
         }
 
@@ -48,7 +48,7 @@ export default function AdoptRequestForm({ params }) {
         });
 
         if (res.status === 401 || res.status === 403) {
-          router.replace('/login');
+          router.replace(`/login?returnUrl=/adopter/pet/${id}/adopt`);
           return;
         }
 

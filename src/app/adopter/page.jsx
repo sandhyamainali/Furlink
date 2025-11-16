@@ -19,7 +19,7 @@ function AdoptPage() {
     // Require bearer token stored in localStorage under 'access'
     const token = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
     if (!token) {
-      router.replace('/login');
+      router.replace('/login?returnUrl=/adopter');
       return;
     }
 
@@ -35,8 +35,8 @@ function AdoptPage() {
       type: pet.type,
       age: pet.age,
       description: pet.description,
-      image: pet.img || '/img/pet.png', // Use pet image or default
-      location: 'Local', // Default location
+      image: pet.img || '/img/pet.png', 
+      location: 'Local', 
       is_available_for_adoption: true
     }));
 
@@ -49,7 +49,7 @@ function AdoptPage() {
     })
       .then((res) => {
         if (res.status === 401 || res.status === 403) {
-          router.replace('/login');
+          router.replace('/login?returnUrl=/adopter');
           throw new Error('Unauthorized');
         }
         if (!res.ok) throw new Error(`API error ${res.status}`);
@@ -84,7 +84,7 @@ function AdoptPage() {
       <div style={{ padding: 40, textAlign: 'center' }}>
         <h2 style={{ fontSize: 20, marginBottom: 8 }}>Unable to load pets</h2>
         <p style={{ color: '#666' }}>{error}</p>
-        <Link href="/login" style={{ color: '#a0632b', marginTop: 12, display: 'inline-block' }}>Login</Link>
+        <Link href="/login?returnUrl=/adopter" style={{ color: '#a0632b', marginTop: 12, display: 'inline-block' }}>Login</Link>
       </div>
     );
   }

@@ -5,7 +5,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaFacebookF } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { API_BASE } from '@/lib/config';
 
 export default function LoginPage() {
@@ -17,6 +17,7 @@ export default function LoginPage() {
         const [error, setError] = useState("");
 
         const router = useRouter();
+        const searchParams = useSearchParams();
         const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     // Handle form submit for email/password login
     const handleSubmit = async (e) => {
@@ -104,7 +105,8 @@ export default function LoginPage() {
                 }
 
                 // Redirect after successful login
-                router.push('/adopter');
+                const returnUrl = searchParams.get('returnUrl');
+                router.push(returnUrl || '/');
             } else {
                 setError('Unexpected response from server');
             }

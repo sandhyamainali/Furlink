@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "@/context/userContext";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebookF } from "react-icons/fa";
@@ -8,7 +8,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { API_BASE } from '@/lib/config';
 
-function LoginForm() {
+export default function LoginForm() {
         const [email, setEmail] = useState("");
         const [password, setPassword] = useState("");
     const { setUser } = useUser();
@@ -362,11 +362,3 @@ function LoginForm() {
         </>
     );
 }
-export default function LoginPage() {
-    return (
-      <Suspense fallback={<div>Loading...</div>}>
-        <LoginForm />
-      </Suspense>
-    );
-  }
-  

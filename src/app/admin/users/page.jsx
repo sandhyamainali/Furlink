@@ -132,19 +132,9 @@ export default function AdminUsersPage() {
   // Mock data generator for demonstration
   const generateMockUsers = () => {
     return [
+      
       {
         id: 1,
-        username: "admin_user",
-        email: "admin@furlink.com",
-        first_name: "Admin",
-        last_name: "User",
-        is_staff: true,
-        is_active: true,
-        date_joined: "2024-01-15T00:00:00Z",
-        last_login: "2024-12-19T10:30:00Z"
-      },
-      {
-        id: 2,
         username: "john_doe",
         email: "john@example.com",
         first_name: "John",
@@ -155,7 +145,7 @@ export default function AdminUsersPage() {
         last_login: "2024-12-18T15:45:00Z"
       },
       {
-        id: 3,
+        id: 2,
         username: "jane_smith",
         email: "jane@example.com",
         first_name: "Jane",
@@ -166,7 +156,7 @@ export default function AdminUsersPage() {
         last_login: "2024-12-19T09:15:00Z"
       },
       {
-        id: 4,
+        id: 3,
         username: "bob_wilson",
         email: "bob@example.com",
         first_name: "Bob",
@@ -194,7 +184,7 @@ export default function AdminUsersPage() {
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Site Administration</h1>
+        
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-700 flex items-center gap-2">
             <Users className="w-6 h-6" />

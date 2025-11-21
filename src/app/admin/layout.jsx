@@ -109,9 +109,8 @@ function AdminSidebar({ onLogout }) {
         <a href="/admin/users" className="nav-item">Users</a>
         <a href="/admin/pets" className="nav-item">Pets</a>
         <a href="/admin/adoptions" className="nav-item">Adoptions</a>
-        <a href="/admin/categories" className="nav-item">Categories</a>
         <a href="/admin/payments" className="nav-item">Payments</a>
-        <button  onClick={onLogout} className="nav-item logout-btn abutton">Logout</button>
+        <button onClick={onLogout} className="nav-item logout-btn">Logout</button>
       </nav>
     </aside>
   );
@@ -120,7 +119,7 @@ function AdminSidebar({ onLogout }) {
 function AdminHeader({ onLogout }) {
   return (
     <header className="admin-header">
-      <div className="aheader-content">
+      <div className="header-content">
         <h1>Site Administration</h1>
         <div className="header-actions">
           <span>Welcome, Admin</span>

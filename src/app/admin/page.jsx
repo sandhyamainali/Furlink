@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from 'react';
 import { fetchWithAuth } from "@/lib/api";
-import { API_BASE } from '@/lib/config';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -13,6 +12,9 @@ export default function AdminDashboard() {
     payments: 0
   });
   const [recentActions, setRecentActions] = useState([]);
+  const [recentUsers, setRecentUsers] = useState([]);
+  const [recentPets, setRecentPets] = useState([]);
+  const [recentAdoptions, setRecentAdoptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [partialLoading, setPartialLoading] = useState(false);
 
@@ -38,6 +40,10 @@ export default function AdminDashboard() {
         adoptions: Array.isArray(adoptionsData) ? adoptionsData.length : 0
       }));
 
+      // Store recent data
+      setRecentPets(Array.isArray(petsData) ? petsData.slice(-5).reverse() : []);
+      setRecentAdoptions(Array.isArray(adoptionsData) ? adoptionsData.slice(-5).reverse() : []);
+
       // Generate recent actions from real data
       const actions = [];
       if (adoptionsData.length > 0) {
@@ -56,10 +62,6 @@ export default function AdminDashboard() {
           time: 'Recently'
         });
       }
-      actions.push(
-        { type: 'User', name: 'New registration', time: '2 hours ago' },
-        { type: 'System', name: 'Backup completed', time: '1 day ago' }
-      );
       setRecentActions(actions.slice(0, 5));
 
       // Load secondary data in background
@@ -67,6 +69,7 @@ export default function AdminDashboard() {
       fetchWithAuth("/auth/users/").then(usersRes => {
         const usersData = usersRes.data || [];
         setStats(prev => ({ ...prev, users: Array.isArray(usersData) ? usersData.length : 0 }));
+        setRecentUsers(Array.isArray(usersData) ? usersData.slice(-5).reverse() : []);
       }).catch(err => console.warn("Failed to fetch users:", err));
 
       fetchWithAuth("/shop/orders/").then(paymentsRes => {
@@ -112,7 +115,7 @@ export default function AdminDashboard() {
         <h1 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: 4 }}>Site administration</h1>
         <div style={{ fontSize: "0.875rem", color: "#666", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span><a href="/admin" style={{ color: "#666", textDecoration: "none" }}>Home</a></span>
-          <button className='abutton'
+          <button
             onClick={() => {
               setLoading(true);
               fetchDashboardData();
@@ -136,79 +139,132 @@ export default function AdminDashboard() {
 
       {/* Stats Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 20, marginBottom: 40 }}>
-        <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 4, padding: 20 }}>
-          <div style={{ padding: 16, borderBottom: "1px solid #ddd", background: "#f8f8f8" }}>
-            <h2 style={{ fontSize: "1rem", fontWeight: "bold", margin: 0 }}>Users</h2>
-          </div>
-          <div style={{ padding: 16 }}>
-            <div style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: 8 }}>
-              {partialLoading && stats.users === 0 ? "..." : stats.users}
-            </div>
-            <div style={{ fontSize: "0.875rem", color: "#666" }}>registered users</div>
-          </div>
-        </div>
-
-        <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 4, padding: 20 }}>
-          <div style={{ padding: 16, borderBottom: "1px solid #ddd", background: "#f8f8f8" }}>
-            <h2 style={{ fontSize: "1rem", fontWeight: "bold", margin: 0 }}>Pets</h2>
-          </div>
-          <div style={{ padding: 16 }}>
-            <div style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: 8 }}>{stats.pets}</div>
-            <div style={{ fontSize: "0.875rem", color: "#666" }}>total pets</div>
-          </div>
-        </div>
-
-        <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 4, padding: 20 }}>
-          <div style={{ padding: 16, borderBottom: "1px solid #ddd", background: "#f8f8f8" }}>
-            <h2 style={{ fontSize: "1rem", fontWeight: "bold", margin: 0 }}>Adoptions</h2>
-          </div>
-          <div style={{ padding: 16 }}>
-            <div style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: 8 }}>{stats.adoptions}</div>
-            <div style={{ fontSize: "0.875rem", color: "#666" }}>adoption requests</div>
-          </div>
-        </div>
-
-        <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 4, padding: 20 }}>
-          <div style={{ padding: 16, borderBottom: "1px solid #ddd", background: "#f8f8f8" }}>
-            <h2 style={{ fontSize: "1rem", fontWeight: "bold", margin: 0 }}>Orders</h2>
-          </div>
-          <div style={{ padding: 16 }}>
-            <div style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: 8 }}>
-              {partialLoading && stats.payments === 0 ? "..." : stats.payments}
-            </div>
-            <div style={{ fontSize: "0.875rem", color: "#666" }}>shop orders</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Actions */}
-      <div style={{ marginTop: 40 }}>
-        <h2 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: 20 }}>Recent actions</h2>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 20 }}>
-          <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 4 }}>
+        <a href="/admin/users" style={{ textDecoration: "none", color: "inherit" }}>
+          <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 4, padding: 20, cursor: "pointer", transition: "transform 0.2s", ":hover": { transform: "translateY(-2px)" } }}>
             <div style={{ padding: 16, borderBottom: "1px solid #ddd", background: "#f8f8f8" }}>
-              <h3 style={{ fontSize: "1rem", fontWeight: "bold", margin: 0 }}>Latest activity</h3>
+              <h2 style={{ fontSize: "1rem", fontWeight: "bold", margin: 0 }}>Users</h2>
             </div>
             <div style={{ padding: 16 }}>
-              {recentActions.length === 0 ? (
-                <p style={{ color: "#666", fontStyle: "italic" }}>No recent activity</p>
-              ) : (
-                <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                  {recentActions.map((action, index) => (
-                    <li key={index} style={{ padding: "8px 0", borderBottom: index < recentActions.length - 1 ? "1px solid #eee" : "none" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <div>
-                          <span style={{ fontWeight: "bold", color: "#417690" }}>{action.type}</span>
-                          <span style={{ marginLeft: 8, color: "#333" }}>{action.name}</span>
-                        </div>
-                        <span style={{ fontSize: "0.75rem", color: "#666" }}>{action.time}</span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <div style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: 8 }}>
+                {partialLoading && stats.users === 0 ? "..." : stats.users}
+              </div>
+              <div style={{ fontSize: "0.875rem", color: "#666" }}>registered users</div>
             </div>
+          </div>
+        </a>
+
+        <a href="/admin/pets" style={{ textDecoration: "none", color: "inherit" }}>
+          <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 4, padding: 20, cursor: "pointer" }}>
+            <div style={{ padding: 16, borderBottom: "1px solid #ddd", background: "#f8f8f8" }}>
+              <h2 style={{ fontSize: "1rem", fontWeight: "bold", margin: 0 }}>Pets</h2>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: 8 }}>{stats.pets}</div>
+              <div style={{ fontSize: "0.875rem", color: "#666" }}>total pets</div>
+            </div>
+          </div>
+        </a>
+
+        <a href="/admin/adoptions" style={{ textDecoration: "none", color: "inherit" }}>
+          <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 4, padding: 20, cursor: "pointer" }}>
+            <div style={{ padding: 16, borderBottom: "1px solid #ddd", background: "#f8f8f8" }}>
+              <h2 style={{ fontSize: "1rem", fontWeight: "bold", margin: 0 }}>Adoptions</h2>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: 8 }}>{stats.adoptions}</div>
+              <div style={{ fontSize: "0.875rem", color: "#666" }}>adoption requests</div>
+            </div>
+          </div>
+        </a>
+
+        <a href="/admin/payments" style={{ textDecoration: "none", color: "inherit" }}>
+          <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 4, padding: 20, cursor: "pointer" }}>
+            <div style={{ padding: 16, borderBottom: "1px solid #ddd", background: "#f8f8f8" }}>
+              <h2 style={{ fontSize: "1rem", fontWeight: "bold", margin: 0 }}>Orders</h2>
+            </div>
+            <div style={{ padding: 16 }}>
+              <div style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: 8 }}>
+                {partialLoading && stats.payments === 0 ? "..." : stats.payments}
+              </div>
+              <div style={{ fontSize: "0.875rem", color: "#666" }}>shop orders</div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      {/* Recent Data Grid */}
+      <div style={{ marginTop: 40, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+        
+        {/* Recent Users */}
+        <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 4 }}>
+          <div style={{ padding: 16, borderBottom: "1px solid #ddd", background: "#f8f8f8", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h3 style={{ fontSize: "1rem", fontWeight: "bold", margin: 0 }}>Recent Users</h3>
+            <a href="/admin/users" style={{ fontSize: "0.875rem", color: "#417690", textDecoration: "none" }}>View all →</a>
+          </div>
+          <div style={{ padding: 16 }}>
+            {recentUsers.length === 0 ? (
+              <p style={{ color: "#666", fontStyle: "italic", fontSize: "0.875rem" }}>No users yet</p>
+            ) : (
+              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                {recentUsers.map((user, index) => (
+                  <li key={user.id || index} style={{ padding: "8px 0", borderBottom: index < recentUsers.length - 1 ? "1px solid #eee" : "none" }}>
+                    <div style={{ fontSize: "0.9rem", fontWeight: "500", color: "#333" }}>{user.username || user.email || 'User'}</div>
+                    <div style={{ fontSize: "0.75rem", color: "#666" }}>{user.email}</div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        {/* Recent Pets */}
+        <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 4 }}>
+          <div style={{ padding: 16, borderBottom: "1px solid #ddd", background: "#f8f8f8", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h3 style={{ fontSize: "1rem", fontWeight: "bold", margin: 0 }}>Recent Pets</h3>
+            <a href="/admin/pets" style={{ fontSize: "0.875rem", color: "#417690", textDecoration: "none" }}>View all →</a>
+          </div>
+          <div style={{ padding: 16 }}>
+            {recentPets.length === 0 ? (
+              <p style={{ color: "#666", fontStyle: "italic", fontSize: "0.875rem" }}>No pets yet</p>
+            ) : (
+              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                {recentPets.map((pet, index) => (
+                  <li key={pet.id || index} style={{ padding: "8px 0", borderBottom: index < recentPets.length - 1 ? "1px solid #eee" : "none" }}>
+                    <div style={{ fontSize: "0.9rem", fontWeight: "500", color: "#333" }}>{pet.name || 'Unnamed Pet'}</div>
+                    <div style={{ fontSize: "0.75rem", color: "#666" }}>{pet.breed || 'Unknown breed'} • {pet.age || 'Age unknown'}</div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        {/* Recent Adoptions */}
+        <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 4 }}>
+          <div style={{ padding: 16, borderBottom: "1px solid #ddd", background: "#f8f8f8", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h3 style={{ fontSize: "1rem", fontWeight: "bold", margin: 0 }}>Recent Adoptions</h3>
+            <a href="/admin/adoptions" style={{ fontSize: "0.875rem", color: "#417690", textDecoration: "none" }}>View all →</a>
+          </div>
+          <div style={{ padding: 16 }}>
+            {recentAdoptions.length === 0 ? (
+              <p style={{ color: "#666", fontStyle: "italic", fontSize: "0.875rem" }}>No adoptions yet</p>
+            ) : (
+              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                {recentAdoptions.map((adoption, index) => (
+                  <li key={adoption.id || index} style={{ padding: "8px 0", borderBottom: index < recentAdoptions.length - 1 ? "1px solid #eee" : "none" }}>
+                    <div style={{ fontSize: "0.9rem", fontWeight: "500", color: "#333" }}>{adoption.pet_name || 'Pet'}</div>
+                    <div style={{ fontSize: "0.75rem", color: "#666" }}>
+                      Status: <span style={{ 
+                        padding: "2px 6px", 
+                        borderRadius: "3px", 
+                        background: adoption.status === 'approved' ? '#d4edda' : '#fff3cd',
+                        color: adoption.status === 'approved' ? '#155724' : '#856404'
+                      }}>{adoption.status || 'pending'}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </div>

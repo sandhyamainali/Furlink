@@ -1,8 +1,5 @@
 "use client";
 import { useState } from "react";
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebookF } from "react-icons/fa";
-import Link from "next/link";
 import Image from "next/image";
 import { API_BASE } from '@/lib/config';
 import { useRouter } from "next/navigation";
@@ -11,7 +8,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -21,8 +17,6 @@ export default function LoginPage() {
   const [temporaryAddress, setTemporaryAddress] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [contactNumber, setContactNumber] = useState("");
-  const [havePet, setHavePet] = useState("no");
-  const [haveVet, setHaveVet] = useState("no");
 
   const router = useRouter();
 
@@ -52,8 +46,8 @@ export default function LoginPage() {
       if (!/^\d{5,10}$/.test(postalCode)) {
         throw new Error("Please enter a valid postal code.");
       }
-      if (!/^\+?[\d\s\-]{7,15}$/.test(contactNumber)) {
-        throw new Error("Please enter a valid contact number.");
+      if (!/^\d{10}$/.test(contactNumber)) {
+        throw new Error("Please enter a valid 10-digit contact number.");
       }
 
   // Prepare registration payload expected by backend
@@ -93,11 +87,6 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleSocialLogin = (provider) => {
-    console.log(`Logging in with ${provider}`);
-    alert(`Redirecting to ${provider} login...`);
   };
 
   return (
@@ -385,8 +374,14 @@ export default function LoginPage() {
               required
               disabled={isLoading}
               value={contactNumber}
-              onChange={(e) => setContactNumber(e.target.value)}
-              placeholder="Enter your contact number"
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                if (value.length <= 10) {
+                  setContactNumber(value);
+                }
+              }}
+              placeholder="Enter 10-digit contact number"
+              maxLength="10"
               style={{
                 width: "100%",
                 padding: "10px",
@@ -396,67 +391,10 @@ export default function LoginPage() {
                 outlineColor: "#cc4400",
               }}
             />
+            <small style={{ color: "#666", fontSize: "0.85rem" }}>
+              {contactNumber.length}/10 digits
+            </small>
           </div>
-
-          <fieldset style={{ marginBottom: "20px" }} required>
-            <legend style={{ fontWeight: "bold", marginBottom: "8px", color: "#333" }}>
-              Do you have a pet?
-            </legend>
-            <label style={{ marginRight: "15px" }}>
-              <input
-                type="radio"
-                name="havePet"
-                value="yes"
-                disabled={isLoading}
-                checked={havePet === "yes"}
-                onChange={() => setHavePet("yes")}
-                required
-              />{" "}
-              Yes
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="havePet"
-                value="no"
-                disabled={isLoading}
-                checked={havePet === "no"}
-                onChange={() => setHavePet("no")}
-                required
-              />{" "}
-              No
-            </label>
-          </fieldset>
-
-          <fieldset style={{ marginBottom: "20px" }} required>
-            <legend style={{ fontWeight: "bold", marginBottom: "8px", color: "#333" }}>
-              Do you have a regular veterinarian?
-            </legend>
-            <label style={{ marginRight: "15px" }}>
-              <input
-                type="radio"
-                name="haveVet"
-                value="yes"
-                disabled={isLoading}
-                checked={haveVet === "yes"}
-                onChange={() => setHaveVet("yes")}
-                required
-              />{" "}
-              Yes
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="haveVet"
-                value="no"
-                disabled={isLoading}
-                checked={haveVet === "no"}
-                onChange={() => setHaveVet("no")}
-                required
-              />{" "}
-              No
-            </label>
-          </fieldset>
 
           <button
             type="submit"

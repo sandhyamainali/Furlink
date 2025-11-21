@@ -105,7 +105,7 @@ function AdoptPage() {
           </p>
 
           <div style={{ display: 'flex', gap: '10px', marginBottom: '30px' }}>
-           <button
+           {/* <button
               onClick={() => setActiveTab('adopt')}
               style={{
                 padding: '12px 24px',
@@ -122,8 +122,8 @@ function AdoptPage() {
               }}
             >
               🐾 Adopt a Pet
-            </button>
-            <Link href="/adopter/submit" style={{ textDecoration: 'none' }}>
+            </button> */}
+            {/* <Link href="/adopter/submit" style={{ textDecoration: 'none' }}>
               <button
                 onClick={() => setActiveTab('list')}
                 style={{
@@ -143,7 +143,7 @@ function AdoptPage() {
               >
                 ➕ List a Pet for Adoption
               </button>
-            </Link>
+            </Link> */}
           </div>
 
           <div style={{ 

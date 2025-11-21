@@ -241,13 +241,13 @@ export default function ProfilePage() {
   }
 
   // Derived stats
-  const stats = useMemo(() => {
-    const total = listings.length;
-    const permanent = listings.filter((l) => l.adoptionType === "Permanent").length;
-    const temporary = listings.filter((l) => l.adoptionType === "Temporary").length;
-    const active = total;
-    return { total, permanent, temporary, active };
-  }, [listings]);
+  // const stats = useMemo(() => {
+  //   const total = listings.length;
+  //   const permanent = listings.filter((l) => l.adoptionType === "Permanent").length;
+  //   const temporary = listings.filter((l) => l.adoptionType === "Temporary").length;
+  //   const active = total;
+  //   return { total, permanent, temporary, active };
+  // }, [listings]);
 
   // Filtered listings
   const filteredListings = useMemo(() => {
@@ -675,7 +675,7 @@ export default function ProfilePage() {
         </div>
       )}
       <h1 style={{ fontSize: "2rem", fontWeight: 800, marginBottom: 16 }}>Dashboard</h1>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+      {/* <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
         <button
           onClick={handleLogout}
           style={{
@@ -690,17 +690,17 @@ export default function ProfilePage() {
         >
           Log out
         </button>
-      </div>
+      </div> */}
 
       {/* Stats */}
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 20 }}>
+      {/* <section style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 20 }}>
         {[{ label: "Total Listings", value: stats.total }, { label: "Active", value: stats.active }, { label: "Permanent", value: stats.permanent }, { label: "Temporary", value: stats.temporary }].map((s, i) => (
           <div key={i} style={{ background: "#fff", borderRadius: 8, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
             <div style={{ color: "#666", fontSize: 14, marginBottom: 6 }}>{s.label}</div>
             <div style={{ fontSize: 26, fontWeight: 800 }}>{s.value}</div>
           </div>
         ))}
-      </section>
+      </section> */}
 
       {/* 👤 Profile */}
       <section style={{ background: "#fff", borderRadius: 8, padding: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.08)", marginBottom: 20 }}>

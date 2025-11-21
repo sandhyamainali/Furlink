@@ -186,8 +186,8 @@ const PetFoodWebsite = () => {
 
             {/* review section start */}
 
-            <section className="happy-families">
-                <div className="container">
+            <section className="happy-families" >
+                <div className="container ">
                     <h2 className="title">Happy Families</h2>
                     <p className="subtitle">
                         Read stories from families who found their perfect companions

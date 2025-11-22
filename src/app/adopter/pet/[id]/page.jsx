@@ -291,7 +291,7 @@ export default function PetProfilePage({ params }) {
                 margin: '0 0 15px 0',
                 fontWeight: '600'
               }}>
-                Reason for Adoption
+                {/* Reason for Adoption */}
               </h2>
               <p style={{ 
                 color: '#555', 
@@ -311,7 +311,7 @@ export default function PetProfilePage({ params }) {
                 margin: '0 0 15px 0',
                 fontWeight: '600'
               }}>
-                Special Requirements
+                {/* Special Requirements */}
               </h2>
               <p style={{ 
                 color: '#555', 
@@ -332,7 +332,7 @@ export default function PetProfilePage({ params }) {
                   margin: '0 0 15px 0',
                   fontWeight: '600'
                 }}>
-                  Health Information
+                  {/* Health Information */}
                 </h2>
                 <div style={{ color: '#555', fontSize: '16px', lineHeight: '1.6' }}>
                   {pet.raw?.vaccination_status && (
@@ -479,10 +479,10 @@ export default function PetProfilePage({ params }) {
                     <span style={{ color: '#666', fontSize: '14px' }}>Age:</span>
                     <span style={{ color: '#333', fontSize: '14px', fontWeight: '500' }}>{pet.age}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  {/* <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: '#666', fontSize: '14px' }}>Location:</span>
                     <span style={{ color: '#333', fontSize: '14px', fontWeight: '500' }}>{pet.location}</span>
-                  </div>
+                  </div> */}
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: '#666', fontSize: '14px' }}>Adoption Type:</span>
                     <span style={{ color: '#333', fontSize: '14px', fontWeight: '500' }}>{pet.raw?.adoption_type || '—'}</span>

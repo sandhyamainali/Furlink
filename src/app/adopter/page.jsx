@@ -26,7 +26,7 @@ function AdoptPage() {
     // Get pets from localStorage (added by users in profile)
     const localPetsRaw = typeof window !== 'undefined' ? localStorage.getItem('furlink_pets') : null;
     const localPets = localPetsRaw ? JSON.parse(localPetsRaw) : [];
-    
+
     // Transform local pets to match API format
     const transformedLocalPets = localPets.map(pet => ({
       id: pet.id,
@@ -35,12 +35,12 @@ function AdoptPage() {
       type: pet.type,
       age: pet.age,
       description: pet.description,
-      image: pet.img || '/img/pet.png', 
-      location: 'Local', 
+      photo: pet.photo,
+      location: 'Local',
       is_available_for_adoption: true
     }));
 
-    
+
     fetch(`${API_BASE}/pet/pets/`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -105,7 +105,7 @@ function AdoptPage() {
           </p>
 
           <div style={{ display: 'flex', gap: '10px', marginBottom: '30px' }}>
-           {/* <button
+            {/* <button
               onClick={() => setActiveTab('adopt')}
               style={{
                 padding: '12px 24px',
@@ -146,9 +146,9 @@ function AdoptPage() {
             </Link> */}
           </div>
 
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
             gap: '10px',
             marginBottom: '40px',
             backgroundColor: 'white',
@@ -212,8 +212,30 @@ function AdoptPage() {
                 position: 'relative',
               }}
             >
+              {/* {pet.photo ? (
+                <Image
+                  src={pet.photo}
+                  alt={pet.name || "Pet"}
+                  fill
+                  style={{ objectFit: "cover" }}
+                />
+              ) : (
+                <div
+                  style={{
+
+                    position: 'relative',
+                    width: '100%',
+                    height: '250px'
+                  }}
+
+                >
+
+
+                </div>
+              )} */}
+
               <div style={{ position: 'relative', width: '100%', height: '250px' }}>
-                <Image src={pet.image} alt={pet.name} 
+                <Image src={pet.photo} alt={pet.name} 
                   fill
                   style={{ objectFit: 'cover' }}
                 />
@@ -248,7 +270,7 @@ function AdoptPage() {
               </div>
               <div style={{ padding: '20px' }}>
                 <h3 style={{ margin: '0 0 5px 0', color: '#333', fontSize: '1.3rem' }}>{pet.name}</h3>
-                
+
                 <p style={{ margin: '0 0 8px 0', color: '#888', fontSize: '0.9rem' }}>
                   Location: {pet.location}
                 </p>
@@ -256,7 +278,7 @@ function AdoptPage() {
                   Age:{pet.age}
                 </p>
                 <p style={{ margin: '0 0 8px 0', color: '#888', fontSize: '0.9rem' }}>
-                   Adoption Days:{pet.adoption_days}
+                  Adoption Days:{pet.adoption_days}
                 </p>
                 <p style={{ margin: '10px 0 15px 0', color: '#555', fontSize: '0.9rem', lineHeight: '1.5' }}>
                   Description: {pet.description}

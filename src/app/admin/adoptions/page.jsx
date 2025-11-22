@@ -317,9 +317,7 @@ export default function AdminAdoptionsPage() {
   );
 }
 
-/* ---------------------------------------------
-   STYLES (Beige Theme Same as Users & Pets)
---------------------------------------------- */
+
 const styles = {
   pageWrapper: {
     minHeight: "100vh",

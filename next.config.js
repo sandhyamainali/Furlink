@@ -1,5 +1,3 @@
-// next.config.js
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -34,10 +32,16 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+
+      // ✅ ADD THIS FOR DJANGO LOCALHOST MEDIA
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+        port: '8000',
+        pathname: '/media/**',
+      },
     ],
   },
-  // Add any other Next.js configurations here
 };
 
-// This is the line you NEED to change to fix the error
 export default nextConfig;
